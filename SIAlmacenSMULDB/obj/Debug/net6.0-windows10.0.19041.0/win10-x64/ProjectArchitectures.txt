@@ -1,0 +1,1 @@
+C:\Septimo CSharp\SIAlmacenSMULDB\SIAlmacenSMULDB\SIAlmacenSMULDB.csproj;x64

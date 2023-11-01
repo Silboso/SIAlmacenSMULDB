@@ -1,0 +1,81 @@
+{
+  "Files": [
+    {
+      "Id": "C:\\Septimo CSharp\\SIAlmacenSMULDB\\SIAlmacenSMULDB\\obj\\Debug\\net6.0-windows10.0.19041.0\\win10-x64\\scopedcss\\bundle\\SIAlmacenSMULDB.styles.css",
+      "PackagePath": "staticwebassets\\SIAlmacenSMULDB.styles.css"
+    },
+    {
+      "Id": "C:\\Septimo CSharp\\SIAlmacenSMULDB\\SIAlmacenSMULDB\\wwwroot\\css\\app.css",
+      "PackagePath": "staticwebassets\\css\\app.css"
+    },
+    {
+      "Id": "C:\\Septimo CSharp\\SIAlmacenSMULDB\\SIAlmacenSMULDB\\wwwroot\\css\\bootstrap\\bootstrap.min.css",
+      "PackagePath": "staticwebassets\\css\\bootstrap\\bootstrap.min.css"
+    },
+    {
+      "Id": "C:\\Septimo CSharp\\SIAlmacenSMULDB\\SIAlmacenSMULDB\\wwwroot\\css\\bootstrap\\bootstrap.min.css.map",
+      "PackagePath": "staticwebassets\\css\\bootstrap\\bootstrap.min.css.map"
+    },
+    {
+      "Id": "C:\\Septimo CSharp\\SIAlmacenSMULDB\\SIAlmacenSMULDB\\wwwroot\\css\\open-iconic\\FONT-LICENSE",
+      "PackagePath": "staticwebassets\\css\\open-iconic"
+    },
+    {
+      "Id": "C:\\Septimo CSharp\\SIAlmacenSMULDB\\SIAlmacenSMULDB\\wwwroot\\css\\open-iconic\\ICON-LICENSE",
+      "PackagePath": "staticwebassets\\css\\open-iconic"
+    },
+    {
+      "Id": "C:\\Septimo CSharp\\SIAlmacenSMULDB\\SIAlmacenSMULDB\\wwwroot\\css\\open-iconic\\README.md",
+      "PackagePath": "staticwebassets\\css\\open-iconic\\README.md"
+    },
+    {
+      "Id": "C:\\Septimo CSharp\\SIAlmacenSMULDB\\SIAlmacenSMULDB\\wwwroot\\css\\open-iconic\\font\\css\\open-iconic-bootstrap.min.css",
+      "PackagePath": "staticwebassets\\css\\open-iconic\\font\\css\\open-iconic-bootstrap.min.css"
+    },
+    {
+      "Id": "C:\\Septimo CSharp\\SIAlmacenSMULDB\\SIAlmacenSMULDB\\wwwroot\\css\\open-iconic\\font\\fonts\\open-iconic.eot",
+      "PackagePath": "staticwebassets\\css\\open-iconic\\font\\fonts\\open-iconic.eot"
+    },
+    {
+      "Id": "C:\\Septimo CSharp\\SIAlmacenSMULDB\\SIAlmacenSMULDB\\wwwroot\\css\\open-iconic\\font\\fonts\\open-iconic.otf",
+      "PackagePath": "staticwebassets\\css\\open-iconic\\font\\fonts\\open-iconic.otf"
+    },
+    {
+      "Id": "C:\\Septimo CSharp\\SIAlmacenSMULDB\\SIAlmacenSMULDB\\wwwroot\\css\\open-iconic\\font\\fonts\\open-iconic.svg",
+      "PackagePath": "staticwebassets\\css\\open-iconic\\font\\fonts\\open-iconic.svg"
+    },
+    {
+      "Id": "C:\\Septimo CSharp\\SIAlmacenSMULDB\\SIAlmacenSMULDB\\wwwroot\\css\\open-iconic\\font\\fonts\\open-iconic.ttf",
+      "PackagePath": "staticwebassets\\css\\open-iconic\\font\\fonts\\open-iconic.ttf"
+    },
+    {
+      "Id": "C:\\Septimo CSharp\\SIAlmacenSMULDB\\SIAlmacenSMULDB\\wwwroot\\css\\open-iconic\\font\\fonts\\open-iconic.woff",
+      "PackagePath": "staticwebassets\\css\\open-iconic\\font\\fonts\\open-iconic.woff"
+    },
+    {
+      "Id": "C:\\Septimo CSharp\\SIAlmacenSMULDB\\SIAlmacenSMULDB\\wwwroot\\favicon.ico",
+      "PackagePath": "staticwebassets\\favicon.ico"
+    },
+    {
+      "Id": "C:\\Septimo CSharp\\SIAlmacenSMULDB\\SIAlmacenSMULDB\\wwwroot\\index.html",
+      "PackagePath": "staticwebassets\\index.html"
+    },
+    {
+      "Id": "obj\\Debug\\net6.0-windows10.0.19041.0\\win10-x64\\staticwebassets\\msbuild.SIAlmacenSMULDB.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net6.0-windows10.0.19041.0\\win10-x64\\staticwebassets\\msbuild.build.SIAlmacenSMULDB.props",
+      "PackagePath": "build\\SIAlmacenSMULDB.props"
+    },
+    {
+      "Id": "obj\\Debug\\net6.0-windows10.0.19041.0\\win10-x64\\staticwebassets\\msbuild.buildMultiTargeting.SIAlmacenSMULDB.props",
+      "PackagePath": "buildMultiTargeting\\SIAlmacenSMULDB.props"
+    },
+    {
+      "Id": "obj\\Debug\\net6.0-windows10.0.19041.0\\win10-x64\\staticwebassets\\msbuild.buildTransitive.SIAlmacenSMULDB.props",
+      "PackagePath": "buildTransitive\\SIAlmacenSMULDB.props"
+    }
+  ],
+  "ElementsToRemove": []
+}
