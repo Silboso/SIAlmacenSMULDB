@@ -1,1 +1,0 @@
-C:\Users\MANE1\source\repos\SIAlmacenSMULDB\SIAlmacenSMULDB\SIAlmacenSMULDB.csproj;x64
