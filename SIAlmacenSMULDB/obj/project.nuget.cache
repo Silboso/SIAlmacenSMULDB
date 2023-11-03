@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "rcy6o37RBePXcc0j5sidybI14z5u0LP9hjQqSo8VmwdbYa6Ki9yP+MkdJGU2xwXZVB3Uqei9HaLd/m0O10KUnA==",
+  "dgSpecHash": "+ylG9AHEyHLxkm1vzFBu9OerkPjANbpwDsd8RLcgHHb8wvvXkTlOR7u3c8XmyJ6CuyqG0JdjunQGLPts0cH6Ng==",
   "success": true,
-  "projectFilePath": "C:\\Septimo CSharp\\SIAlmacenSMULDB\\SIAlmacenSMULDB\\SIAlmacenSMULDB.csproj",
+  "projectFilePath": "C:\\Users\\MANE1\\source\\repos\\SIAlmacenSMULDB\\SIAlmacenSMULDB\\SIAlmacenSMULDB.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\MANE1\\.nuget\\packages\\azure.core\\1.25.0\\azure.core.1.25.0.nupkg.sha512",
     "C:\\Users\\MANE1\\.nuget\\packages\\azure.identity\\1.7.0\\azure.identity.1.7.0.nupkg.sha512",

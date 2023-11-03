@@ -1,0 +1,112 @@
+﻿@page "/Productos"
+@inject AlmacenSQLContext Contexto
+
+<TituloConAñadir Nombre="Productos" Link="Productos/Crear"></TituloConAñadir>
+
+<!--Tabla que muestra todos los productos-->
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Nombre</th>
+            <th>Codigo de Barras</th>
+            <th>Categoria</th>
+            <th>Descripcion</th>
+            <th>Precio</th>
+            <th>Stock</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var producto in productos)
+        {
+            <tr>
+                <td>@producto.ProductoID</td>
+                <td>@producto.Nombre</td>
+                <td>@producto.CodigoBarra</td>
+                <td>@producto.CategoriaID</td>
+                <td>@producto.Descripcion</td>
+                <td>@producto.Precio</td>
+                <td>@producto.Stock</td>
+                <td>
+                    <a class="btn btn-primary" href="productos/Editar"><Icon Name="IconName.Pen" /></a>
+                    <button class="btn btn-danger" @onclick="(() => EliminarProducto(producto.ProductoID))"><Icon Name="IconName.Trash" /></button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+@code {
+    [Inject] protected PreloadService PreloadService { get; set; }
+    private List<Producto> productos = new List<Producto>();
+    [Inject] protected ToastService ToastService { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        PreloadService.Show(SpinnerColor.Primary);
+        try
+        {
+            await Task.Run(async () =>
+            {
+                //Trae los productos cuyo estado sea activo
+                productos = await Contexto.Productos.Where(p => p.Estado == EstadoRegistro.Activo).ToListAsync();
+            });
+            //Añade un retraso de medio segundo para que se muestre el spinner
+            await Task.Delay(500);
+
+        }
+        catch (Exception e)
+        {
+            PreloadService.Hide();
+            await Application.Current.MainPage.DisplayAlert("Error", "Fallo al conectarse a base de datos" + e, "Ok");
+        }
+        finally
+        {
+            PreloadService.Hide();
+        }
+
+
+    }
+
+    private async void EliminarProducto(int id)
+    {
+        var producto = await Contexto.Productos.FindAsync(id);
+        //Muestra una alerta de confirmacion
+        bool respuesta = await Application.Current.MainPage.DisplayAlert("Confirmacion",
+        "¿Estas seguro de eliminar este producto?\n" +
+        "ID del Producto: " + producto.ProductoID +
+        "\nNombre: " + producto.Nombre +
+        "\nDescripcion: " + producto.Descripcion +
+        "\nCodigo de barras: " + producto.CodigoBarra,
+        "Si", "No");
+        if (respuesta)
+        {
+            PreloadService.Show(SpinnerColor.Primary);
+            try
+            {
+                //Elimina el producto, para ello solo se actualiza el estado del producto
+                producto.Estado = EstadoRegistro.Inactivo;
+                Contexto.Productos.Update(producto);
+                await Contexto.SaveChangesAsync();
+
+                //Actualiza la lista de productos
+                productos = await Contexto.Productos.Where(p => p.Estado == EstadoRegistro.Activo).ToListAsync();
+                //Refresca la interfaz
+                StateHasChanged();
+                //Espera 1 segundo
+                await Task.Delay(500);
+                PreloadService.Hide();
+                //Tostada "El registro se elimino con exito
+                ToastService.Notify(new(ToastType.Warning, $"Eliminado con exito"));
+            }
+            catch (Exception e)
+            {
+                PreloadService.Hide();
+                await Application.Current.MainPage.DisplayAlert("Error", "Fallo al conectarse a base de datos" + e, "Ok");
+            }
+        }
+    }
+}

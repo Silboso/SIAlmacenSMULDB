@@ -1,0 +1,12 @@
+﻿<div style="display: flex; align-items: center;">
+    <!-- Título de la interfaz del lado izquierdo -->
+    <h1 style="margin-right: 10px;">@Nombre</h1>
+    <!-- Botón en el extremo derecho y a la misma altura del título -->
+    <a class="btn btn-success" href=@Link style="margin-left: auto;">Añadir</a>
+</div>
+
+@code {
+    [Parameter] public string Nombre { get; set; }
+    [Parameter] public string Link { get; set; }
+
+}

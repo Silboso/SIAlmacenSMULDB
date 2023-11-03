@@ -1,0 +1,206 @@
+﻿@page "/Productos/Crear"
+@inject AlmacenSQLContext Contexto
+@inject NavigationManager NavigationManager
+
+<TituloSolito Nombre="Registrar Producto"></TituloSolito>
+
+<!-- Formulario de registro del producto -->
+<!--Por cada proveedor registrado se genera un ProductoProveedor con el dato del proveedor y del producto-->
+<!--El producto se registra con estado activo-->
+<div class="container">
+    <h2>Registro de Producto</h2>
+
+    <EditForm Model="@nuevoProducto" OnValidSubmit="RegistrarProducto">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label for="Nombre">Nombre del Producto:</label>
+            <InputText id="Nombre" class="form-control" @bind-Value="nuevoProducto.Nombre" />
+            <ValidationMessage For="@(() => nuevoProducto.Nombre)" />
+        </div>
+
+        <div class="form-group">
+            <label for="Descripcion">Descripción:</label>
+            <InputText id="Descripcion" class="form-control" @bind-Value="nuevoProducto.Descripcion" />
+        </div>
+
+        <div class="form-group">
+            <label for="Precio">Precio:</label>
+            <InputNumber id="Precio" class="form-control" @bind-Value="nuevoProducto.Precio" />
+            <ValidationMessage For="@(() => nuevoProducto.Precio)" />
+        </div>
+
+        <div class="form-group">
+            <label for="Stock">Stock:</label>
+            <InputNumber id="Stock" class="form-control" @bind-Value="nuevoProducto.Stock" />
+            <ValidationMessage For="@(() => nuevoProducto.Stock)" />
+        </div>
+
+        <!-- Aquí va el select de categorías, solo se puede elegir una por producto-->
+        <div class="form-group">
+            <label for="CategoriaID">Categoría:</label>
+            <InputSelect id="CategoriaID" class="form-control" @bind-Value="nuevoProducto.CategoriaID">
+                @foreach (var categoria in categorias)
+                {
+                    <option value="@categoria.CategoriaID">@categoria.Nombre</option>
+                }
+            </InputSelect>
+            <ValidationMessage For="@(() => nuevoProducto.CategoriaID)" />
+        </div>
+
+        <div class="form-group">
+            <label for="CodigoBarra">Código de Barras:</label>
+            <InputText id="CodigoBarra" class="form-control" @bind-Value="nuevoProducto.CodigoBarra" />
+            <ValidationMessage For="@(() => nuevoProducto.CodigoBarra)" />
+        </div>
+        <!-- Formulario de selección de proveedores, se puede elegir uno o varios-->
+        <!-- Cuando se selecciona uno, solo se muestra su nombre, al presionar un boton de + al lado-->
+        <!-- Este se añade a la lista de seleccionados-->
+        <!-- Cuando se presiona el boton de - se elimina de la lista de seleccionados-->
+        <div class="form-group">
+            <label for="Proveedores">Proveedores:</label>
+            <div class="row">
+                <div class="col-6">
+                    <InputSelect id="Proveedores" class="form-control" @bind-Value="nuevoProductoProveedor.ProveedorID">
+                        @foreach (var proveedor in proveedores)
+                        {
+                            <option value="@proveedor.ProveedorID">@proveedor.Nombre</option>
+                        }
+                    </InputSelect>
+                </div>
+                <div class="col-6">
+                    <button type="button" class="btn btn-primary" @onclick="() => añadirProveedor(nuevoProductoProveedor.ProveedorID)">+</button>
+                </div>
+            </div>
+            @if (proveedoresSeleccionados.Any())
+            {
+                <div class="form-group">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>ID del Proveedor</th>
+                                <th>Nombre del Proveedor</th>
+                                <th>Eliminar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var proveedorID in proveedoresSeleccionados)
+                            {
+                                var proveedor = proveedores.FirstOrDefault(p => p.ProveedorID == proveedorID);
+                                if (proveedor != null)
+                                {
+                                    <tr>
+                                        <td>@proveedor.ProveedorID</td>
+                                        <td>@proveedor.Nombre</td>
+                                        <td>
+                                            <button type="button" class="btn btn-danger" @onclick="() => EliminarProveedorSeleccionado(proveedorID)">Eliminar</button>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+        <!-- Añade un espacio-->
+        <br />
+        <button type="submit" class="btn btn-primary">Registrar Producto</button>
+    </EditForm>
+</div>
+
+@code {
+    [Inject] protected PreloadService PreloadService { get; set; }
+    [Inject] protected ToastService ToastService { get; set; }
+    private Producto nuevoProducto = new Producto();
+    private List<CategoriaProducto> categorias = new List<CategoriaProducto>();
+    private List<Proveedor> proveedores = new List<Proveedor>();
+    private ProductoProveedor nuevoProductoProveedor = new ProductoProveedor();
+    private List<int> proveedoresSeleccionados = new List<int>();
+
+
+    //Carga las categorías de productos al iniciar la página
+    protected override async Task OnInitializedAsync()
+    {
+        PreloadService.Show(SpinnerColor.Primary);
+        try
+        {
+            await Task.Run(async () =>
+            {
+                //Trae las categorías de productos cuyo estado sea activo
+                categorias = await Contexto.CategoriasProductos.Where(c => c.Estado == EstadoRegistro.Activo).ToListAsync();
+                //Trae todos los proveedores cuyo estado sea activo
+                proveedores = await Contexto.Proveedores.Where(p => p.Estado == EstadoRegistro.Activo).ToListAsync();
+            });
+            //Añade un retraso de medio segundo para que se muestre el spinner
+            await Task.Delay(500);
+        }
+        catch (Exception e)
+        {
+            PreloadService.Hide();
+            await Application.Current.MainPage.DisplayAlert("Error", "Fallo al conectarse a base de datos" + e, "Ok");
+        }
+        finally
+        {
+            PreloadService.Hide();
+        }
+    }
+
+    private async Task RegistrarProducto()
+    {
+        try
+        {
+            // Agregar el producto a la base de datos
+            nuevoProducto.Estado = EstadoRegistro.Activo; // Estado activo
+            Contexto.Productos.Add(nuevoProducto);
+
+            // Guardar los cambios en la base de datos
+            await Contexto.SaveChangesAsync();
+
+            // Registrar ProductoProveedor para cada proveedor seleccionado
+            foreach (var proveedorID in proveedoresSeleccionados)
+            {
+                var productoProveedor = new ProductoProveedor
+                    {
+                        ProductoID = nuevoProducto.ProductoID, // Asigna el ID del producto recién registrado
+                        ProveedorID = proveedorID,
+                        Estado = EstadoRegistro.Activo // Estado activo
+                    };
+                Contexto.ProductosProveedores.Add(productoProveedor);
+            }
+
+            // Guardar los cambios en la base de datos para los ProductoProveedor
+            await Contexto.SaveChangesAsync();
+            StateHasChanged();
+            // Mostrar tostada de éxito
+            ToastService.Notify(new(ToastType.Success, $"Producto Añadido"));
+            // Redirigir a la página de productos
+            NavigationManager.NavigateTo("/Productos");
+        }
+        catch (Exception e)
+        {
+            // Maneja los errores apropiadamente
+            await Application.Current.MainPage.DisplayAlert("Error", "Fallo al registrar el producto: " + e.Message, "Ok");
+        }
+    }
+
+    private void EliminarProveedorSeleccionado(int proveedorID)
+    {
+        proveedoresSeleccionados.Remove(proveedorID);
+    }
+
+    private void añadirProveedor(int proveedorID)
+    {
+        if (!proveedoresSeleccionados.Contains(proveedorID))
+        {
+            proveedoresSeleccionados.Add(proveedorID);
+        }
+        else
+        {
+            Application.Current.MainPage.DisplayAlert("Error", "El proveedor ya ha sido seleccionado", "Ok");
+        }
+    }
+
+}
+

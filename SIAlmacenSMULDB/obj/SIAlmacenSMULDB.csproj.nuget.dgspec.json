@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Septimo CSharp\\SIAlmacenSMULDB\\SIAlmacenSMULDB\\SIAlmacenSMULDB.csproj": {}
+    "C:\\Users\\MANE1\\source\\repos\\SIAlmacenSMULDB\\SIAlmacenSMULDB\\SIAlmacenSMULDB.csproj": {}
   },
   "projects": {
-    "C:\\Septimo CSharp\\SIAlmacenSMULDB\\SIAlmacenSMULDB\\SIAlmacenSMULDB.csproj": {
+    "C:\\Users\\MANE1\\source\\repos\\SIAlmacenSMULDB\\SIAlmacenSMULDB\\SIAlmacenSMULDB.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Septimo CSharp\\SIAlmacenSMULDB\\SIAlmacenSMULDB\\SIAlmacenSMULDB.csproj",
+        "projectUniqueName": "C:\\Users\\MANE1\\source\\repos\\SIAlmacenSMULDB\\SIAlmacenSMULDB\\SIAlmacenSMULDB.csproj",
         "projectName": "SIAlmacenSMULDB",
-        "projectPath": "C:\\Septimo CSharp\\SIAlmacenSMULDB\\SIAlmacenSMULDB\\SIAlmacenSMULDB.csproj",
+        "projectPath": "C:\\Users\\MANE1\\source\\repos\\SIAlmacenSMULDB\\SIAlmacenSMULDB\\SIAlmacenSMULDB.csproj",
         "packagesPath": "C:\\Users\\MANE1\\.nuget\\packages\\",
-        "outputPath": "C:\\Septimo CSharp\\SIAlmacenSMULDB\\SIAlmacenSMULDB\\obj\\",
+        "outputPath": "C:\\Users\\MANE1\\source\\repos\\SIAlmacenSMULDB\\SIAlmacenSMULDB\\obj\\",
         "projectStyle": "PackageReference",
         "crossTargeting": true,
         "fallbackFolders": [
