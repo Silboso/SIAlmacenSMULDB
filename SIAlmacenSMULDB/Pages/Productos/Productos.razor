@@ -3,6 +3,21 @@
 
 <TituloConAñadir Nombre="Productos" Link="Productos/Crear"></TituloConAñadir>
 
+
+<!--DropDown Filtro-->
+<Dropdown>
+    <DropdownToggleButton Color="ButtonColor.Primary">@GetSelectedCategoriaText()</DropdownToggleButton>
+    <DropdownMenu>
+        <DropdownItem @onclick="() => FilterProductosByCategoria(0)">Todos</DropdownItem>
+        @foreach (var categoria in categorias)
+        {
+            <DropdownItem @onclick="() => FilterProductosByCategoria(categoria.CategoriaID)">@categoria.Nombre</DropdownItem>
+        }
+    </DropdownMenu>
+</Dropdown>
+
+
+
 <!--Tabla que muestra todos los productos-->
 
 <table class="table table-striped">
@@ -25,7 +40,7 @@
                 <td>@producto.ProductoID</td>
                 <td>@producto.Nombre</td>
                 <td>@producto.CodigoBarra</td>
-                <td>@producto.CategoriaID</td>
+                <td>@categorias.Find(c => c.CategoriaID == producto.CategoriaID).Nombre</td>
                 <td>@producto.Descripcion</td>
                 <td>@producto.Precio</td>
                 <td>@producto.Stock</td>
@@ -40,7 +55,7 @@
                         <i class="bi bi-trash"></i>
                     </button>
                     <!--Boton informacion-->
-                    
+
                 </td>
             </tr>
         }
@@ -52,6 +67,9 @@
     [Inject] protected PreloadService PreloadService { get; set; }
     private List<Producto> productos = new List<Producto>();
     [Inject] protected ToastService ToastService { get; set; }
+    //Lista de categorias de productos
+    private List<CategoriaProducto> categorias = new List<CategoriaProducto>();
+    private int selectedCategoriaID = 0; // Inicialmente, selecciona "Todos" (0)
 
     protected override async Task OnInitializedAsync()
     {
@@ -62,6 +80,8 @@
             {
                 //Trae los productos cuyo estado sea activo
                 productos = await Contexto.Productos.Where(p => p.Estado == EstadoRegistro.Activo).ToListAsync();
+                //Trae las categorias de productos cuyo estado sea activo
+                categorias = await Contexto.CategoriasProductos.Where(c => c.Estado == EstadoRegistro.Activo).ToListAsync();
             });
             //Añade un retraso de medio segundo para que se muestre el spinner
             await Task.Delay(500);
@@ -116,6 +136,35 @@
                 PreloadService.Hide();
                 await Application.Current.MainPage.DisplayAlert("Error", "Fallo al conectarse a base de datos" + e, "Ok");
             }
+        }
+    }
+
+    private void FilterProductosByCategoria(int categoriaID)
+    {
+        selectedCategoriaID = categoriaID;
+        // Filtra la lista de productos según la categoría seleccionada
+        if (categoriaID == 0)
+        {
+            // Muestra todos los productos
+            productos = Contexto.Productos.Where(p => p.Estado == EstadoRegistro.Activo).ToList();
+        }
+        else
+        {
+            // Muestra solo los productos de la categoría seleccionada
+            productos = Contexto.Productos.Where(p => p.Estado == EstadoRegistro.Activo && p.CategoriaID == categoriaID).ToList();
+        }
+        StateHasChanged();
+    }
+
+    private string GetSelectedCategoriaText()
+    {
+        if (selectedCategoriaID == 0)
+        {
+            return "Todos";
+        }
+        else
+        {
+            return categorias.Find(c => c.CategoriaID == selectedCategoriaID).Nombre;
         }
     }
 }
