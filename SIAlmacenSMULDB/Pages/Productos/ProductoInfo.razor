@@ -1,0 +1,66 @@
+﻿@page "/Productos/Info/{ProductoID:int}"
+@inject AlmacenSQLContext Contexto
+@inject NavigationManager NavigationManager
+
+<TituloSolito Nombre="Información del Producto"></TituloSolito>
+
+<!--Muestra toda la informacion del producto-->
+
+<div class="container">
+    <div class="row">
+        <div class="col-5">
+            <img src="@producto.URLImagen" alt="Imagen del producto" class="img-fluid">
+        </div>
+        <div class="col-7">
+            <h3><strong>@producto.Nombre</strong></h3>
+            <p><strong>Código de Barras:</strong> @producto.CodigoBarra</p>
+            <p><strong>Descripción:</strong> @producto.Descripcion</p>
+            <p><strong>Categoría:</strong> @categoria.Nombre</p>
+            <p><strong>Precio:</strong> @producto.Precio</p>
+            <p><strong>Stock:</strong> @producto.Stock</p>
+            <p><strong>Proveedores:</strong></p>
+            <ul>
+                @foreach (var productoProveedor in productosProveedores)
+                {
+                    <li><strong>@proveedores.Find(proveedor => proveedor.ProveedorID == productoProveedor.ProveedorID).Nombre</strong></li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+
+
+@code {
+    [Inject] protected PreloadService PreloadService { get; set; }
+    [Parameter] public int ProductoID { get; set; }
+    private Producto producto = new Producto();
+    private List<ProductoProveedor> productosProveedores = new List<ProductoProveedor>();
+    private List<Proveedor> proveedores = new List<Proveedor>();
+    private CategoriaProducto categoria = new CategoriaProducto();
+
+    protected override async Task OnInitializedAsync()
+    {
+        PreloadService.Show(SpinnerColor.Primary);
+        try
+        {
+            producto = await Contexto.Productos.FindAsync(ProductoID);
+            //Trae los proveedores del producto cuyo estado sea activo
+            productosProveedores = await Contexto.ProductosProveedores.Where(pp => pp.ProductoID == ProductoID && pp.Estado == EstadoRegistro.Activo).ToListAsync();
+            proveedores = await Contexto.Proveedores.ToListAsync();
+            //Trae la categoria del producto
+            categoria = await Contexto.CategoriasProductos.FindAsync(producto.CategoriaID);
+        }
+        catch (Exception ex)
+        {
+            await Application.Current.MainPage.DisplayAlert("Error", "Fallo al conectarse a base de datos" + ex, "Ok");
+        }
+        finally
+        {
+            PreloadService.Hide();
+        }
+    }
+
+
+}
