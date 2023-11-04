@@ -19,6 +19,7 @@ namespace SIAlmacenSMULDB.ModelsSQL
     CategoriaID int NULL,
     Estado int NULL,
     CodigoBarra  nvarchar(255)
+    URLImagen nvarchar(255)
     );*/
     //Todos los valores son requeridos excepto el ID
     [Table("Productos")]
@@ -40,5 +41,6 @@ namespace SIAlmacenSMULDB.ModelsSQL
         [Required]
         [StringLength(13, MinimumLength = 13)]
         public string CodigoBarra { get; set; }
+        public string URLImagen { get; set; }
     }
 }

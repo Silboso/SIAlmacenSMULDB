@@ -54,6 +54,12 @@
             <InputText id="CodigoBarra" class="form-control" @bind-Value="nuevoProducto.CodigoBarra" />
             <ValidationMessage For="@(() => nuevoProducto.CodigoBarra)" />
         </div>
+        <!-- Añadir URL de la imagen-->
+        <div class="form-group">
+            <label for="Imagen">URL Imagen:</label>
+            <InputText id="Imagen" class="form-control" @bind-Value="nuevoProducto.URLImagen" />
+            <ValidationMessage For="@(() => nuevoProducto.URLImagen)" />
+        </div>
         <!-- Formulario de selección de proveedores, se puede elegir uno o varios-->
         <!-- Cuando se selecciona uno, solo se muestra su nombre, al presionar un boton de + al lado-->
         <!-- Este se añade a la lista de seleccionados-->

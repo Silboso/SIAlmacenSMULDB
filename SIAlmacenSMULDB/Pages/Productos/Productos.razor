@@ -30,8 +30,8 @@
                 <td>@producto.Precio</td>
                 <td>@producto.Stock</td>
                 <td>
-                    <a class="btn btn-primary" href="productos/Editar"><Icon Name="IconName.Pen" /></a>
-                    <button class="btn btn-danger" @onclick="(() => EliminarProducto(producto.ProductoID))"><Icon Name="IconName.Trash" /></button>
+                    <a class="btn btn-primary" href="productos/Editar">Editar</a>
+                    <button class="btn btn-danger oi oi-trash" @onclick="(() => EliminarProducto(producto.ProductoID))">Eliminar</button>
                 </td>
             </tr>
         }
