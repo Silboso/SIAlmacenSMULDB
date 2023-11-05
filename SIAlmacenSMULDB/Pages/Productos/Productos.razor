@@ -3,6 +3,7 @@
 
 <TituloConAñadir Nombre="Productos" Link="Productos/Crear"></TituloConAñadir>
 
+
 <!--Espacio para busquedas por codigo de barra o nombre-->
 <div class="row">
     <div class="col-12 col-md-6">
@@ -42,7 +43,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var producto in productos)
+        @foreach (var producto in productos.Skip((currentPageNumber - 1) * itemsPerPage).Take(itemsPerPage))
         {
             <tr>
                 <td>@producto.ProductoID</td>
@@ -70,6 +71,25 @@
     </tbody>
 </table>
 
+<!-- Si no hay productos, muestra un mensaje -->
+@if (productos.Count == 0)
+{
+    <div class="alert alert-info" role="alert">
+        No hay productos
+    </div>
+}
+
+<div class="d-flex justify-content-center">
+<!-- Agrega el componente de paginación -->
+<Pagination ActivePageNumber="@currentPageNumber" 
+            TotalPages="totalPages" 
+            PageChanged="OnPageChangedAsync"
+            FirstLinkIcon="IconName.ChevronDoubleLeft"
+            PreviousLinkIcon="IconName.ChevronLeft"
+            NextLinkIcon="IconName.ChevronRight"
+            LastLinkIcon="IconName.ChevronDoubleRight" />
+</div>
+
 
 @code {
     [Inject] protected PreloadService PreloadService { get; set; }
@@ -80,6 +100,17 @@
     private int selectedCategoriaID = 0; // Inicialmente, selecciona "Todos" (0)
     //Busqueda
     private string searchText = "";
+    int currentPageNumber = 1;
+    int itemsPerPage = 10; // Define la cantidad de elementos por página
+    int totalPages => (int)Math.Ceiling(productos.Count / (double)itemsPerPage);
+
+
+    // Se ejecuta cuando se cambia de página
+    private async Task OnPageChangedAsync(int newPageNumber)
+    {
+        currentPageNumber = newPageNumber;
+        StateHasChanged(); // Asegúrate de forzar la actualización de la interfaz de usuario
+    }
 
 
 
@@ -94,6 +125,7 @@
                 productos = await Contexto.Productos.Where(p => p.Estado == EstadoRegistro.Activo).ToListAsync();
                 //Trae las categorias de productos cuyo estado sea activo
                 categorias = await Contexto.CategoriasProductos.Where(c => c.Estado == EstadoRegistro.Activo).ToListAsync();
+                //Calcula el total de paginas
             });
             //Añade un retraso de medio segundo para que se muestre el spinner
             await Task.Delay(500);
