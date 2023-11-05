@@ -28,7 +28,6 @@
 
 
 <!--Tabla que muestra todos los productos-->
-
 <table class="table table-striped">
     <thead>
         <tr>
@@ -76,10 +75,10 @@
     [Inject] protected PreloadService PreloadService { get; set; }
     private List<Producto> productos = new List<Producto>();
     [Inject] protected ToastService ToastService { get; set; }
-
     //Lista de categorias de productos
     private List<CategoriaProducto> categorias = new List<CategoriaProducto>();
     private int selectedCategoriaID = 0; // Inicialmente, selecciona "Todos" (0)
+    //Busqueda
     private string searchText = "";
 
 
