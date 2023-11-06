@@ -1,0 +1,170 @@
+﻿@page "/Productos/EditarProductoProveedores/{ProductoID:int}"
+@inject AlmacenSQLContext Contexto
+@inject NavigationManager NavigationManager
+
+<TituloSolito Nombre="Editar Proveedores"></TituloSolito>
+
+<!-- Formulario de selección de proveedores, se puede elegir uno o varios-->
+<!-- Cuando se selecciona uno, solo se muestra su nombre, al presionar un boton de + al lado-->
+<!-- Este se registra si no existe ya uno similar en la lista de productos proveedores-->
+<!-- Cuando se presiona eliminar, se elimina de forma logica en base de datos-->
+<div class="container">
+    <EditForm Model="nuevoProductoProveedor" OnValidSubmit="RegistrarProductosProveedor">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label for="ProveedorID">Proveedor:</label>
+            <InputSelect id="ProveedorID" class="form-control" @bind-Value="nuevoProductoProveedor.ProveedorID">
+                @foreach (var proveedor in proveedores)
+                {
+                    <option value="@proveedor.ProveedorID">@proveedor.Nombre</option>
+                }
+            </InputSelect>
+            <ValidationMessage For="@(() => nuevoProductoProveedor.ProveedorID)" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Guardar</button>
+
+        <!--Tabla de proveedores actuales-->
+        @if (proveedoresSeleccionados.Any())
+        {
+            <div class="form-group">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>ID del Proveedor</th>
+                            <th>Nombre del Proveedor</th>
+                            <th>Eliminar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var proveedorID in proveedoresSeleccionados)
+                        {
+                            var proveedor = proveedores.FirstOrDefault(p => p.ProveedorID == proveedorID);
+                            if (proveedor != null)
+                            {
+                                <tr>
+                                    <td>@proveedor.ProveedorID</td>
+                                    <td>@proveedor.Nombre</td>
+                                    <td>
+                                        <button type="button" class="btn btn-danger" @onclick="() => EliminarProveedorSeleccionado(proveedorID)">Eliminar</button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+
+    </EditForm>
+</div>
+
+<!-- Lista de proveedores seleccionados-->
+@code {
+    [Inject] protected PreloadService PreloadService { get; set; }
+    [Inject] protected ToastService ToastService { get; set; }
+    [Parameter] public int ProductoID { get; set; }
+    private List<ProductoProveedor> productosProveedores = new List<ProductoProveedor>();
+    private List<Proveedor> proveedores = new List<Proveedor>();
+    private ProductoProveedor nuevoProductoProveedor = new ProductoProveedor();
+    private List<int> proveedoresSeleccionados = new List<int>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        PreloadService.Show(SpinnerColor.Primary);
+        try
+        {
+            //trae los productos proveedores cuyo producto sea el mismo que el producto que se esta editando
+            productosProveedores = await Contexto.ProductosProveedores.Where(pp => pp.ProductoID == ProductoID).ToListAsync();
+            //trae los proveedores cuyo estado sea activo
+            proveedores = await Contexto.Proveedores.Where(p => p.Estado == EstadoRegistro.Activo).ToListAsync();
+            //trae los proveedores seleccionados
+            proveedoresSeleccionados = productosProveedores.Select(pp => pp.ProveedorID).ToList();
+        }
+        catch (Exception ex)
+        {
+            await Application.Current.MainPage.DisplayAlert("Error", "Fallo al conectarse a base de datos" + ex, "Ok");
+        }
+        finally
+        {
+            PreloadService.Hide();
+        }
+    }
+
+    private async Task RegistrarProductosProveedor()
+    {
+        PreloadService.Show(SpinnerColor.Primary);
+        try
+        {
+            //Si el proveedor ya esta seleccionado, no se puede volver a seleccionar
+            if (proveedoresSeleccionados.Contains(nuevoProductoProveedor.ProveedorID))
+            {
+                //alerta de aplicacion
+                await Application.Current.MainPage.DisplayAlert("Error", "El proveedor ya esta seleccionado", "Ok");
+            }
+            else
+            {
+                //Añade el proveedor a la lista de proveedores seleccionados
+                proveedoresSeleccionados.Add(nuevoProductoProveedor.ProveedorID);
+                //Añade el proveedor a la lista de productos proveedores
+                productosProveedores.Add(new ProductoProveedor
+                    {
+                        ProductoID = ProductoID,
+                        ProveedorID = nuevoProductoProveedor.ProveedorID,
+                        Estado = EstadoRegistro.Activo
+                    });
+                //Refresca la interfaz
+                StateHasChanged();
+                //Espera 1 segundo
+                await Task.Delay(500);
+                PreloadService.Hide();
+            }
+        }
+        catch (Exception ex)
+        {
+            await Application.Current.MainPage.DisplayAlert("Error", "Fallo al conectarse a base de datos" + ex, "Ok");
+        }
+        finally
+        {
+            PreloadService.Hide();
+        }
+    }
+
+private async Task EliminarProveedorSeleccionado(int proveedorID)
+    {
+        PreloadService.Show(SpinnerColor.Primary);
+        try
+        {
+            //Busca el producto proveedor que tenga el mismo producto y proveedor que el seleccionado
+            var productoProveedor = productosProveedores.FirstOrDefault(pp => pp.ProductoID == ProductoID && pp.ProveedorID == proveedorID);
+            //Si existe, lo elimina
+            if (productoProveedor != null)
+            {
+                //Elimina el producto proveedor de la lista de productos proveedores
+                productosProveedores.Remove(productoProveedor);
+                //Elimina el proveedor de la lista de proveedores seleccionados
+                proveedoresSeleccionados.Remove(proveedorID);
+                //Refresca la interfaz
+                StateHasChanged();
+                //Espera 1 segundo
+                await Task.Delay(500);
+                PreloadService.Hide();
+            }
+        }
+        catch (Exception ex)
+        {
+            await Application.Current.MainPage.DisplayAlert("Error", "Fallo al conectarse a base de datos" + ex, "Ok");
+        }
+        finally
+        {
+            PreloadService.Hide();
+        }
+    }
+
+
+
+
+
+}
