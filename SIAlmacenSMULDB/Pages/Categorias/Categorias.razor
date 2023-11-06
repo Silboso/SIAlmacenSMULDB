@@ -1,8 +1,115 @@
 ﻿@page "/Categorias"
 @inject AlmacenSQLContext Contexto
+@inject NavigationManager NavigationManager
 
 <TituloConAñadir Nombre="Categorias" Link="Categorias/Crear"></TituloConAñadir>
 
-@code {
 
+
+<!--Tabla que contiene las categorias-->
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Nombre</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var categoria in categorias)
+        {
+            <tr>
+                <td>@categoria.CategoriaID</td>
+                <td>@categoria.Nombre</td>
+                <td>
+                    <!--Boton informacion-->
+                    <a class="btn btn-primary" href="Categorias/Info/@categoria.CategoriaID">
+                        <i class="bi bi-info"></i>
+                    </a>
+                    <a class="btn btn-secondary" href="Categorias/Editar/@categoria.CategoriaID">
+                        <i class="bi bi-pencil-square"></i>
+                    </a>
+                    <button class="btn btn-danger" @onclick="(() => EliminarCategoria(categoria.CategoriaID))">
+                        <i class="bi bi-trash"></i>
+                    </button>
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+@code {
+    [Inject] protected PreloadService PreloadService { get; set; }
+    [Inject] protected ToastService ToastService { get; set; }
+    private List<CategoriaProducto> categorias = new List<CategoriaProducto>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        PreloadService.Show(SpinnerColor.Primary);
+        try
+        {
+            //Trae las categorias activas
+            categorias = await Contexto.CategoriasProductos.Where(c => c.Estado == EstadoRegistro.Activo).ToListAsync();
+            //Quita la categoria con el id 1002 que pertenece a los productos sin categoria
+            categorias.Remove(categorias.Find(c => c.CategoriaID == 1002));
+        }
+        catch (Exception ex)
+        {
+            await Application.Current.MainPage.DisplayAlert("Error", "Fallo al conectarse a base de datos" + ex, "Ok");
+        }
+        finally
+        {
+            PreloadService.Hide();
+        }
+    }
+
+    private async Task EliminarCategoria(int CategoriaID)
+    {
+        PreloadService.Show(SpinnerColor.Primary);
+        //Mensaje de confirmación
+        var confirm = await Application.Current.MainPage.DisplayAlert("Confirmación", "¿Está seguro de eliminar esta categoria?", "Si", "No");
+        if (!confirm)
+        {
+            return;
+            PreloadService.Hide();
+        }
+        else
+        {
+            try
+            {
+                var categoria = await Contexto.CategoriasProductos.FindAsync(CategoriaID);
+                //Elimina la categoria de la base de datos de forma logica
+                categoria.Estado = EstadoRegistro.Inactivo;
+                await Contexto.SaveChangesAsync();
+                //Tostada de confirmación
+                ToastService.Notify(new(ToastType.Warning, $"Eliminado con exito"));
+                categorias = await Contexto.CategoriasProductos.ToListAsync();
+                //Actualiza todos los productos que tengan la categoria eliminada para que tengan la categoria 1002
+                var productos = await Contexto.Productos.Where(p => p.CategoriaID == CategoriaID).ToListAsync();
+                foreach (var producto in productos)
+                {
+                    producto.CategoriaID = 1002;
+                    Contexto.Productos.Update(producto);
+                    await Contexto.SaveChangesAsync();
+                }
+                //Refresca la interfaz
+                StateHasChanged();
+                //Espera 1 segundo
+                await Task.Delay(500);
+                PreloadService.Hide();
+                //Redirigete a la misma pagina
+                NavigationManager.NavigateTo("/Categorias");
+            }
+            catch (Exception ex)
+            {
+                await Application.Current.MainPage.DisplayAlert("Error", "Fallo al conectarse a base de datos" + ex, "Ok");
+            }
+            finally
+            {
+                PreloadService.Hide();
+            }
+        }
+    }
 }

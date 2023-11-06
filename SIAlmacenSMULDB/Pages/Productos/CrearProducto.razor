@@ -7,7 +7,11 @@
 <!-- Formulario de registro del producto -->
 <!--Por cada proveedor registrado se genera un ProductoProveedor con el dato del proveedor y del producto-->
 <!--El producto se registra con estado activo-->
+
+
 <div class="container">
+    <div class="col-sm-2"></div>
+    <div class="col-sm-8">
     <EditForm Model="@nuevoProducto" OnValidSubmit="RegistrarProducto">
         <DataAnnotationsValidator />
         <ValidationSummary />
@@ -108,11 +112,13 @@
                     </table>
                 </div>
             }
-        </div>
+        
         <!-- Añade un espacio-->
         <br />
         <button type="submit" class="btn btn-primary">Registrar Producto</button>
+        </div>
     </EditForm>
+    </div>
 </div>
 
 @code {

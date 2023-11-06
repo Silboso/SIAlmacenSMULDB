@@ -57,6 +57,8 @@
             <InputText id="Imagen" class="form-control" @bind-Value="producto.URLImagen" />
             <ValidationMessage For="@(() => producto.URLImagen)" />
         </div>
+        <!--Espacio en blanco-->
+        <br />
         <button type="submit" class="btn btn-primary">Guardar</button>
         <!--Recargar la interfaz-->
         <button type="button" class="btn btn-secondary" @onclick="Recargar">Cancelar</button>

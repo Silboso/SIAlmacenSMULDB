@@ -1,0 +1,81 @@
+﻿@page "/Categorias/Editar/{CategoriaID:int}"
+@inject AlmacenSQLContext Contexto
+@inject NavigationManager NavigationManager
+
+<TituloSolito Nombre="Editar Categoria"></TituloSolito>
+<EditForm Model="categoria" OnValidSubmit="EditarCategoria">
+
+    <DataAnnotationsValidator />
+
+    <ValidationSummary />
+
+    <div class="form-group">
+
+        <label for="Nombre">Nombre:</label>
+
+        <InputText id="Nombre" class="form-control" @bind-Value="categoria.Nombre" />
+
+        <ValidationMessage For="@(() => categoria.Nombre)" />
+
+        <label for="Descripcion">Descripcion:</label>
+
+        <InputText id="Descripcion" class="form-control" @bind-Value="categoria.Descripcion" />
+
+        <ValidationMessage For="@(() => categoria.Descripcion)" />
+
+    </div>
+
+    <br />
+
+    <button type="submit" class="btn btn-primary">Editar</button>
+
+</EditForm>
+
+@code {
+    [Inject] protected PreloadService PreloadService { get; set; }
+
+    [Inject] protected ToastService ToastService { get; set; }
+
+    [Parameter] public int CategoriaID { get; set; }
+
+    private CategoriaProducto categoria = new CategoriaProducto();
+
+    protected override async Task OnInitializedAsync()
+    {
+        PreloadService.Show(SpinnerColor.Primary);
+        try
+        {
+            categoria = await Contexto.CategoriasProductos.FindAsync(CategoriaID);
+        }
+        catch (Exception ex)
+        {
+            await Application.Current.MainPage.DisplayAlert("Error", "Fallo al conectarse a base de datos" + ex, "Ok");
+        }
+        finally
+        {
+            PreloadService.Hide();
+        }
+    }
+
+    private async Task EditarCategoria()
+    {
+        PreloadService.Show(SpinnerColor.Primary);
+        try
+        {
+            Contexto.CategoriasProductos.Update(categoria);
+            await Contexto.SaveChangesAsync();
+            //Tostada de confirmación
+            ToastService.Notify(new(ToastType.Warning, $"Editado con exito"));
+            NavigationManager.NavigateTo("/Categorias");
+        }
+        catch (Exception ex)
+        {
+            await Application.Current.MainPage.DisplayAlert("Error", "Fallo al conectarse a base de datos" + ex, "Ok");
+        }
+        finally
+        {
+            PreloadService.Hide();
+        }
+    }
+
+}

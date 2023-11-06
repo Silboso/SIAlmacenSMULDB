@@ -54,6 +54,7 @@
                 <td>@producto.Precio</td>
                 <td>@producto.Stock</td>
                 <td>
+                    <!--Boton informacion-->
                     <a class="btn btn-primary" href="productos/Info/@producto.ProductoID">
                         <i class="bi bi-info"></i>
                     </a>
@@ -63,7 +64,7 @@
                     <button class="btn btn-danger" @onclick="(() => EliminarProducto(producto.ProductoID))">
                         <i class="bi bi-trash"></i>
                     </button>
-                    <!--Boton informacion-->
+
 
                 </td>
             </tr>
@@ -80,14 +81,14 @@
 }
 
 <div class="d-flex justify-content-center">
-<!-- Agrega el componente de paginación -->
-<Pagination ActivePageNumber="@currentPageNumber" 
-            TotalPages="totalPages" 
-            PageChanged="OnPageChangedAsync"
-            FirstLinkIcon="IconName.ChevronDoubleLeft"
-            PreviousLinkIcon="IconName.ChevronLeft"
-            NextLinkIcon="IconName.ChevronRight"
-            LastLinkIcon="IconName.ChevronDoubleRight" />
+    <!-- Agrega el componente de paginación -->
+    <Pagination ActivePageNumber="@currentPageNumber"
+                TotalPages="totalPages"
+                PageChanged="OnPageChangedAsync"
+                FirstLinkIcon="IconName.ChevronDoubleLeft"
+                PreviousLinkIcon="IconName.ChevronLeft"
+                NextLinkIcon="IconName.ChevronRight"
+                LastLinkIcon="IconName.ChevronDoubleRight" />
 </div>
 
 
@@ -98,7 +99,7 @@
     //Lista de categorias de productos
     private List<CategoriaProducto> categorias = new List<CategoriaProducto>();
     private int selectedCategoriaID = 0; // Inicialmente, selecciona "Todos" (0)
-    //Busqueda
+                                         //Busqueda
     private string searchText = "";
     int currentPageNumber = 1;
     int itemsPerPage = 10; // Define la cantidad de elementos por página
@@ -123,8 +124,8 @@
             {
                 //Trae los productos cuyo estado sea activo
                 productos = await Contexto.Productos.Where(p => p.Estado == EstadoRegistro.Activo).ToListAsync();
-                //Trae las categorias de productos cuyo estado sea activo
-                categorias = await Contexto.CategoriasProductos.Where(c => c.Estado == EstadoRegistro.Activo).ToListAsync();
+                //Trae las categorias de productos sin importar su estado
+                categorias = await Contexto.CategoriasProductos.ToListAsync();
                 //Calcula el total de paginas
             });
             //Añade un retraso de medio segundo para que se muestre el spinner

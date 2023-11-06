@@ -1,0 +1,59 @@
+﻿@page "/Categorias/Crear"
+@inject AlmacenSQLContext Contexto
+@inject NavigationManager NavigationManager
+
+<TituloSolito Nombre="Crear Categoria"></TituloSolito>
+
+<EditForm Model="nuevaCategoria" OnValidSubmit="RegistrarCategoria">
+
+    <DataAnnotationsValidator />
+
+    <ValidationSummary />
+
+    <div class="form-group">
+
+        <label for="Nombre">Nombre:</label>
+
+        <InputText id="Nombre" class="form-control" @bind-Value="nuevaCategoria.Nombre" />
+
+        <label for="Descripcion">Descripcion:</label>
+
+        <InputText id="Descripcion" class="form-control" @bind-Value="nuevaCategoria.Descripcion" />
+
+        <ValidationMessage For="@(() => nuevaCategoria.Nombre)" />
+
+    </div>
+
+    <br />
+
+    <button type="submit" class="btn btn-primary">Registrar</button>
+
+</EditForm>
+@code {
+    [Inject] protected PreloadService PreloadService { get; set; }
+    [Inject] protected ToastService ToastService { get; set; }
+    private CategoriaProducto nuevaCategoria = new CategoriaProducto();
+
+    private async Task RegistrarCategoria()
+    {
+        PreloadService.Show(SpinnerColor.Primary);
+        try
+        {
+            nuevaCategoria.Estado = EstadoRegistro.Activo;  
+            await Contexto.CategoriasProductos.AddAsync(nuevaCategoria);
+            await Contexto.SaveChangesAsync();
+            //Tostada de confirmación
+            ToastService.Notify(new(ToastType.Warning, $"Registrado con exito"));
+            NavigationManager.NavigateTo("/Categorias");
+        }
+        catch (Exception ex)
+        {
+            await Application.Current.MainPage.DisplayAlert("Error", "Fallo al conectarse a base de datos" + ex, "Ok");
+        }
+        finally
+        {
+            PreloadService.Hide();
+        }
+    }
+
+}

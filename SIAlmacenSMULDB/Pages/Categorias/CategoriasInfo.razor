@@ -1,0 +1,79 @@
+﻿@page "/Categorias/Info/{CategoriaID:int}"
+@inject AlmacenSQLContext Contexto
+@inject NavigationManager NavigationManager
+
+<TituloSolito Nombre="Informacion Categoria"></TituloSolito>
+
+<!--Informacion de la categoria-->
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h3><strong>@categoria.Nombre</strong></h3>
+            <p><strong>Descripción:</strong> @categoria.Descripcion</p>
+        </div>
+    </div>
+</div>
+
+<!--Muestra un titulo para la tabla que diga Productos de la categoria + nombre de la categoria-->
+<h3>Productos de la categoria @categoria.Nombre</h3>
+
+<!--Tabla que contiene los productos de la categoria-->
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Nombre</th>
+            <th>Código de Barras</th>
+            <th>Descripción</th>
+            <th>Precio</th>
+            <th>Stock</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var producto in productos)
+        {
+            <tr>
+                <td>@producto.ProductoID</td>
+                <td>@producto.Nombre</td>
+                <td>@producto.CodigoBarra</td>
+                <td>@producto.Descripcion</td>
+                <td>@producto.Precio</td>
+                <td>@producto.Stock</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+
+
+    @code {
+        [Inject] protected PreloadService PreloadService { get; set; }
+        [Inject] protected ToastService ToastService { get; set; }
+        [Parameter] public int CategoriaID { get; set; }
+        private CategoriaProducto categoria = new CategoriaProducto();
+        private List<Producto> productos = new List<Producto>();
+
+        protected override async Task OnInitializedAsync()
+        {
+            PreloadService.Show(SpinnerColor.Primary);
+            try
+            {
+                categoria = await Contexto.CategoriasProductos.FindAsync(CategoriaID);
+                //Trae los productos de la categoria cuyo estado sea activo
+                productos = await Contexto.Productos.Where(p => p.CategoriaID == CategoriaID && p.Estado == EstadoRegistro.Activo).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                await Application.Current.MainPage.DisplayAlert("Error", "Fallo al conectarse a base de datos" + ex, "Ok");
+            }
+            finally
+            {
+                PreloadService.Hide();
+            }
+        }
+
+
+
+    }

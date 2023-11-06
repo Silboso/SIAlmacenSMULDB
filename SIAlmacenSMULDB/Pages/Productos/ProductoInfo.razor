@@ -48,6 +48,7 @@
             producto = await Contexto.Productos.FindAsync(ProductoID);
             //Trae los proveedores del producto cuyo estado sea activo
             productosProveedores = await Contexto.ProductosProveedores.Where(pp => pp.ProductoID == ProductoID && pp.Estado == EstadoRegistro.Activo).ToListAsync();
+            //Trae todos los proveedores cuyo estado sea activo
             proveedores = await Contexto.Proveedores.ToListAsync();
             //Trae la categoria del producto
             categoria = await Contexto.CategoriasProductos.FindAsync(producto.CategoriaID);

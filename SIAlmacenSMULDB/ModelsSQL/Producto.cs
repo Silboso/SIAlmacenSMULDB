@@ -40,6 +40,8 @@ namespace SIAlmacenSMULDB.ModelsSQL
         public EstadoRegistro Estado { get; set; }
         [Required]
         [StringLength(13, MinimumLength = 13)]
+        //Solo aecpta numeros y guiones
+        [RegularExpression(@"^[0-9\-]*$")]
         public string CodigoBarra { get; set; }
         public string URLImagen { get; set; }
     }

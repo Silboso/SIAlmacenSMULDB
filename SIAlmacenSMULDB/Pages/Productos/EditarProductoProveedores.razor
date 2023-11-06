@@ -4,6 +4,8 @@
 
 <TituloSolito Nombre="Editar Proveedores"></TituloSolito>
 
+<!--Texto que muestra el producto al que se le esta cambiando el proveedor-->
+<h3>Producto: @producto.Nombre</h3>
 <!-- Formulario de selección de proveedores, se puede elegir uno o varios-->
 <!-- Cuando se selecciona uno, solo se muestra su nombre, al presionar un boton de + al lado-->
 <!-- Este se registra si no existe ya uno similar en la lista de productos proveedores-->
@@ -23,9 +25,9 @@
             </InputSelect>
             <ValidationMessage For="@(() => nuevoProductoProveedor.ProveedorID)" />
         </div>
-
-        <button type="submit" class="btn btn-primary">Guardar</button>
-
+        <br />
+        <button type="submit" class="btn btn-primary">Añadir</button>
+        <br />
         <!--Tabla de proveedores actuales-->
         @if (proveedoresSeleccionados.Any())
         {
@@ -70,14 +72,17 @@
     private List<Proveedor> proveedores = new List<Proveedor>();
     private ProductoProveedor nuevoProductoProveedor = new ProductoProveedor();
     private List<int> proveedoresSeleccionados = new List<int>();
+    private Producto producto = new Producto();
 
     protected override async Task OnInitializedAsync()
     {
         PreloadService.Show(SpinnerColor.Primary);
         try
         {
-            //trae los productos proveedores cuyo producto sea el mismo que el producto que se esta editando
-            productosProveedores = await Contexto.ProductosProveedores.Where(pp => pp.ProductoID == ProductoID).ToListAsync();
+            //trae el producto cuyo id sea el mismo que el producto que se esta editando
+            producto = await Contexto.Productos.FindAsync(ProductoID);
+            //trae los productos proveedores cuyo producto sea el mismo que el producto que se esta editando y sean activos
+productosProveedores = await Contexto.ProductosProveedores.Where(pp => pp.ProductoID == ProductoID && pp.Estado == EstadoRegistro.Activo).ToListAsync();
             //trae los proveedores cuyo estado sea activo
             proveedores = await Contexto.Proveedores.Where(p => p.Estado == EstadoRegistro.Activo).ToListAsync();
             //trae los proveedores seleccionados
@@ -120,11 +125,19 @@
                 //Espera 1 segundo
                 await Task.Delay(500);
                 PreloadService.Hide();
+                //Guarda en base de datos los proveedores añadidos
+                await Contexto.ProductosProveedores.AddAsync(new ProductoProveedor
+                    {
+                        ProductoID = ProductoID,
+                        ProveedorID = nuevoProductoProveedor.ProveedorID,
+                        Estado = EstadoRegistro.Activo
+                    });
+                await Contexto.SaveChangesAsync();
             }
         }
         catch (Exception ex)
         {
-            await Application.Current.MainPage.DisplayAlert("Error", "Fallo al conectarse a base de datos" + ex, "Ok");
+            await Application.Current.MainPage.DisplayAlert("Error", "Fallo al conectarse a base de datos a" + ex, "Ok");
         }
         finally
         {
@@ -132,7 +145,7 @@
         }
     }
 
-private async Task EliminarProveedorSeleccionado(int proveedorID)
+    private async Task EliminarProveedorSeleccionado(int proveedorID)
     {
         PreloadService.Show(SpinnerColor.Primary);
         try
@@ -151,6 +164,11 @@ private async Task EliminarProveedorSeleccionado(int proveedorID)
                 //Espera 1 segundo
                 await Task.Delay(500);
                 PreloadService.Hide();
+                //Cambia el estado del producto proveedor a inactivo
+                productoProveedor.Estado = EstadoRegistro.Inactivo;
+                //Guarda los cambios en base de datos
+                Contexto.ProductosProveedores.Update(productoProveedor);
+                await Contexto.SaveChangesAsync();
             }
         }
         catch (Exception ex)
