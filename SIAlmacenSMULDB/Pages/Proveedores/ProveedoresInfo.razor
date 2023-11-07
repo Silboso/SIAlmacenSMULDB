@@ -1,5 +1,72 @@
-﻿<h3>ProveedoresInfo</h3>
+﻿@page "/Proveedores/Info/{id:int}"
+@inject AlmacenSQLContext Contexto
+
+<TituloSolito Nombre="Informacion Proveedor"></TituloSolito>
+
+<!--Muestra todos los datos sobre el proveedor en campos no editables-->
+<div class="container">
+    <div class="row">
+        <div class="col-7">
+            <h3><strong>@proveedor.Nombre</strong></h3>
+            <p><strong>Direccion:</strong> @proveedor.Direccion</p>
+            <p><strong>Telefono:</strong> @proveedor.Telefono</p>
+            <p><strong>Email:</strong> @proveedor.Email</p>
+            <p><strong>Contacto:</strong> @proveedor.Contacto</p>
+        </div>
+        <!--Tabla que muestra todos los productos que provee dicho proveedor-->
+        <div class="col-5">
+            <h3><strong>Productos</strong></h3>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Stock</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var producto in productos)
+                    {
+                        <tr>
+                            <td>@producto.Nombre</td>
+                            <td>@producto.Stock</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
 @code {
+    [Parameter] public int id { get; set; }
+    [Inject] protected PreloadService PreloadService { get; set; }
+    [Inject] protected ToastService ToastService { get; set; }
+    private Proveedor proveedor = new Proveedor();
+    private List<Producto> productos = new List<Producto>();
+    private List<ProductoProveedor> productosProveedor = new List<ProductoProveedor>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        PreloadService.Show(SpinnerColor.Primary);
+        try
+        {
+            proveedor = await Contexto.Proveedores.FindAsync(id);
+            //Trae los productoProveedor que tengan el id del proveedor y sean activos
+            productosProveedor = await Contexto.ProductosProveedores.Where(x => x.ProveedorID == id && x.Estado == EstadoRegistro.Activo).ToListAsync();
+            //Trae los productos que tengan el id del proveedor
+            foreach (var item in productosProveedor)
+            {
+                productos.Add(await Contexto.Productos.FindAsync(item.ProductoID));
+            }
+        }
+        catch (Exception ex)
+        {
+            await Application.Current.MainPage.DisplayAlert("Error", "Fallo al conectarse a base de datos" + ex, "Ok");
+        }
+        finally
+        {
+            PreloadService.Hide();
+        }
+    }
 
 }

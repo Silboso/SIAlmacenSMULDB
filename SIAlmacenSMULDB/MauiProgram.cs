@@ -30,11 +30,11 @@ public static class MauiProgram
 
         });
 
-        //builder.Services.AddDbContext<EmpleadosPGSQLContext>(options =>
-        //{
-        //	options.UseNpgsql(CadenaPostGreSQL);
+        builder.Services.AddDbContext<EmpleadosPGSQLContext>(options =>
+        {
+        	options.UseNpgsql(CadenaPostGreSQL);
 
-        //});
+        });
 
 
         builder.Services.AddMauiBlazorWebView();

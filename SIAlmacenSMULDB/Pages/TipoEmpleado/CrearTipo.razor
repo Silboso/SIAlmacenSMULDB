@@ -1,0 +1,73 @@
+﻿@page "/TipoEmpleado/Crear"
+@inject EmpleadosPGSQLContext Contexto
+@inject NavigationManager NavigationManager
+
+<TituloSolito Nombre="Crear Tipo de Empleado" />
+
+<!--Formulario para crear un tipo de empleado-->
+
+<EditForm Model="@nuevoTipo" OnValidSubmit="RegistrarTipo">
+
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="nombre_categoria">Nombre</label>
+        <InputText id="nombre_categoria" class="form-control" @bind-Value="nuevoTipo.nombre_categoria" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Crear</button>
+
+</EditForm>
+
+
+@code {
+    [Inject] protected PreloadService PreloadService { get; set; }
+    [Inject] protected ToastService ToastService { get; set; }
+    private TipoDeEmpleado nuevoTipo = new TipoDeEmpleado();
+
+protected override async Task OnInitializedAsync()
+    {
+        PreloadService.Show(SpinnerColor.Primary);
+        try
+        {
+            //Espera 1 segundo
+            await Task.Delay(500);
+        }
+        catch (Exception ex)
+        {
+            //Alerta app
+            await Application.Current.MainPage.DisplayAlert("Error", "No se pudo cargar el tipo de empleado", "Ok");
+        }
+        finally
+        {
+            PreloadService.Hide();
+        }
+    }
+
+private async void RegistrarTipo()
+    {
+        PreloadService.Show(SpinnerColor.Primary);
+        try
+        {
+            //Agrega el tipo de empleado a la base de datos
+            Contexto.TiposDeEmpleado.Add(nuevoTipo);
+            //Guarda los cambios
+            await Contexto.SaveChangesAsync();
+            //Alerta de exito
+            ToastService.Notify(new(ToastType.Success, $"El Tipo de empleado se ha creado correctamente"));
+            //Redirecciona a la pagina de tipos de empleado
+            NavigationManager.NavigateTo("/TipoEmpleado");
+        }
+        catch (Exception ex)
+        {
+            //Alerta de error
+            ToastService.Notify(new(ToastType.Warning, $"No se pudo crear el Tipo"));
+        }
+        finally
+        {
+            PreloadService.Hide();
+        }
+    }
+
+}

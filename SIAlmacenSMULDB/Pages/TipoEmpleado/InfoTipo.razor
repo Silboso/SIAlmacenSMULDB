@@ -1,0 +1,78 @@
+﻿@page "/TipoEmpleado/Info/{id:int}"
+@inject EmpleadosPGSQLContext Contexto
+@inject NavigationManager NavigationManager
+
+
+<!--Informacion del Tipo Empleado-->
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-12">
+            <h3><strong>@tipoEmpleado.nombre_categoria</strong></h3>
+        </div>
+    </div>
+</div>
+
+<!--Muestra un titulo para la tabla que diga Empleados del tipo de empleado + nombre del tipo de empleado-->
+
+<h3>Empleados del tipo de empleado @tipoEmpleado.nombre_categoria</h3>
+
+<!--Tabla que contiene los empleados del tipo de empleado-->
+<table class="table table-striped">
+    <thead>
+        <tr>
+
+            <th>Id</th>
+
+            <th>Nombre</th>
+
+            <th>Salario Diario</th>
+
+            <th>Tipo de Empleado</th>
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var empleado in empleados)
+        {
+            <tr>
+                <td>@empleado.identificador</td>
+                <td>@empleado.nombre_completo_empleado</td>
+                <td>@empleado.salario_diario</td>
+                <td>@empleado.tipo_empleado_id</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+@code {
+    [Inject] protected PreloadService PreloadService { get; set; }
+    [Inject] protected ToastService ToastService { get; set; }
+    [Parameter] public int id { get; set; }
+    private TipoDeEmpleado tipoEmpleado = new TipoDeEmpleado();
+    private List<Empleado> empleados = new List<Empleado>();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        PreloadService.Show(SpinnerColor.Primary);
+        try
+        {
+            tipoEmpleado = await Contexto.TiposDeEmpleado.FindAsync(id);
+            //Trae los empleados cuyo estado sea activo organizados por el ID que coincida con el tipo de empleado
+            empleados = await Contexto.Empleados.Where(c => c.estado == EstadoRegistro.Activo && c.tipo_empleado_id == tipoEmpleado.identificador_categoria).OrderBy(c => c.identificador).ToListAsync();
+            await Task.Delay(500);
+        }
+        catch (Exception ex)
+        {
+            await Application.Current.MainPage.DisplayAlert("Error", "No se pudo cargar el tipo de empleado", "Ok");
+        }
+        finally
+        {
+            PreloadService.Hide();
+        }
+    }
+
+}

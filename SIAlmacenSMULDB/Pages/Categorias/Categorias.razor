@@ -54,6 +54,8 @@
             categorias = await Contexto.CategoriasProductos.Where(c => c.Estado == EstadoRegistro.Activo).ToListAsync();
             //Quita la categoria con el id 1002 que pertenece a los productos sin categoria
             categorias.Remove(categorias.Find(c => c.CategoriaID == 1002));
+            //Espera 1 segundo
+            await Task.Delay(500);
         }
         catch (Exception ex)
         {
@@ -72,8 +74,8 @@
         var confirm = await Application.Current.MainPage.DisplayAlert("Confirmación", "¿Está seguro de eliminar esta categoria?", "Si", "No");
         if (!confirm)
         {
-            return;
             PreloadService.Hide();
+            return;
         }
         else
         {

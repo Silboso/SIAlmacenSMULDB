@@ -1,0 +1,113 @@
+﻿@page "/TipoEmpleado"
+@inject EmpleadosPGSQLContext Contexto
+@inject NavigationManager NavigationManager
+
+<TituloConAñadir Nombre="Tipo Empleado" Link="TipoEmpleado/Crear"></TituloConAñadir>
+
+<!--Tabla con los tipo de empleados-->
+<table class="table table-striped">
+
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Nombre</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var tipoEmpleado in tipoEmpleados)
+        {
+            <tr>
+                <td>@tipoEmpleado.identificador_categoria</td>
+                <td>@tipoEmpleado.nombre_categoria</td>
+                <td>
+                    <!--Boton informacion-->
+                    <a class="btn btn-primary" href="TipoEmpleado/Info/@tipoEmpleado.identificador_categoria">
+                        <i class="bi bi-info"></i>
+                    </a>
+                    <a class="btn btn-secondary" href="TipoEmpleado/Editar/@tipoEmpleado.identificador_categoria">
+                        <i class="bi bi-pencil-square"></i>
+                    </a>
+                    <button class="btn btn-danger" @onclick="(() => EliminarTipoEmpleado(tipoEmpleado.identificador_categoria))">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        }
+
+    </tbody>
+
+</table>
+
+
+
+@code {
+    [Inject] protected PreloadService PreloadService { get; set; }
+    [Inject] protected ToastService ToastService { get; set; }
+    private List<TipoDeEmpleado> tipoEmpleados = new List<TipoDeEmpleado>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        PreloadService.Show(SpinnerColor.Primary);
+        try
+        {
+            //Trae los clientes que tengan el estado activo en orden por el id
+            tipoEmpleados = await Contexto.TiposDeEmpleado.Where(c => c.estado == EstadoRegistro.Activo).OrderBy(c => c.identificador_categoria).ToListAsync();
+            //Espera 1 segundo
+            await Task.Delay(500);
+        }
+        catch (Exception ex)
+        {
+            //Alerta de error de tipo app
+            await Application.Current.MainPage.DisplayAlert("Error", "No se pudo cargar los clientes" + ex, "Ok");
+        }
+        finally
+        {
+            PreloadService.Hide();
+        }
+
+    }
+
+    //Proceso de eliminado
+    private async void EliminarTipoEmpleado(int id)
+    {
+        PreloadService.Show(SpinnerColor.Primary);
+        try
+        {
+            //Busca el cliente
+            var tipoEmpleado = await Contexto.TiposDeEmpleado.FindAsync(id);
+            //Cambia el estado a inactivo
+            tipoEmpleado.estado = EstadoRegistro.Inactivo;
+            //Guarda los cambios
+            await Contexto.SaveChangesAsync();
+            //Espera 1 segundo
+            await Task.Delay(500);
+            //Alerta tostado de eliminado
+            ToastService.Notify(new ToastMessage(ToastType.Success, $"El tipo de empleado se ha eliminado correctamente"));
+            //Busca todos los empleados que tengan el id del tipo de empleado
+            var empleados = await Contexto.Empleados.Where(e => e.tipo_empleado_id == id).ToListAsync();
+            //Actualiza el tipo de estos empleados al id 11 que es el tipo de empleado por defecto
+            empleados.ForEach(e => e.tipo_empleado_id = 11);
+            //Actualiza todos esos empleados en el contexto
+            Contexto.Empleados.UpdateRange(empleados);
+            //Guarda los cambios
+            await Contexto.SaveChangesAsync();
+            //Redirecciona a la pagina de Empleado
+            NavigationManager.NavigateTo("/TipoEmpleado", true);
+            //Muestra una tostada que solicite al usuario actualizar los empleados que fueron afectados
+            ToastService.Notify(new ToastMessage(ToastType.Warning, $"Se han actualizado los empleados que tenian el tipo de empleado eliminado"));
+        }
+        catch (Exception ex)
+        {
+            //Alerta de error de tipo app
+            await Application.Current.MainPage.DisplayAlert("Error", "No se pudo eliminar el tipo de empleado", "Ok");
+        }
+        finally
+        {
+            PreloadService.Hide();
+        }
+    }
+
+
+}

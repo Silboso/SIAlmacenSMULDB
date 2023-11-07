@@ -20,8 +20,11 @@ namespace SIAlmacenSMULDB.ModelsSQL
     {
         [Key]
         public int CategoriaID { get; set; }
+        [Required]
         public string Nombre { get; set; }
+        [Required]
         public string Descripcion { get; set; }
+        [Required]
         public EstadoRegistro Estado { get; set; }
     }
 

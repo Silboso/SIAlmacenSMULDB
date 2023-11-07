@@ -1,11 +1,96 @@
 ﻿@page "/Proveedores"
 @inject AlmacenSQLContext Contexto
+@inject NavigationManager NavigationManager
 
 <TituloConAñadir Nombre="Proveedores" Link="Proveedores/Crear"></TituloConAñadir>
 
 <!--Tabla que contiene los proveedores-->
+<div class="container">
+    <div class="col-sm-2"></div>
+    
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Contacto</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var proveedor in proveedores)
+                {
+                    <tr>
+                        <td>@proveedor.Nombre</td>
+                        <td>@proveedor.Contacto</td>
+                        <td>
+                            <!--Boton informacion-->
+                            <a class="btn btn-primary" href="Proveedores/Info/@proveedor.ProveedorID">
+                                <i class="bi bi-info"></i>
+                            </a>
+                            <a class="btn btn-secondary" href="Proveedores/Editar/@proveedor.ProveedorID">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
+                            <button class="btn btn-danger" @onclick="() => EliminarProveedor(proveedor.ProveedorID)">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    
+</div>
 
 
 @code {
+    [Inject] protected PreloadService PreloadService { get; set; }
+    [Inject] protected ToastService ToastService { get; set; }
+    private List<Proveedor> proveedores = new List<Proveedor>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        PreloadService.Show(SpinnerColor.Primary);
+        try
+        {
+            proveedores = await Contexto.Proveedores.ToListAsync();
+            //Espera medio segundo para que se muestre el spinner
+            await Task.Delay(500);
+        }
+        catch (Exception ex)
+        {
+            await Application.Current.MainPage.DisplayAlert("Error", "Fallo al conectarse a base de datos" + ex, "Ok");
+        }
+        finally
+        {
+            PreloadService.Hide();
+        }
+
+    }
+
+    private async void EliminarProveedor(int id)
+    {
+        PreloadService.Show(SpinnerColor.Primary);
+        try
+        {
+            var proveedor = await Contexto.Proveedores.FirstOrDefaultAsync(p => p.ProveedorID == id);
+            proveedor.Estado = EstadoRegistro.Inactivo;
+            Contexto.Proveedores.Update(proveedor);
+            await Contexto.SaveChangesAsync();
+            ToastService.Notify(new(ToastType.Warning, $"Eliminado con exito"));
+            //Tostada que notifique "Por favor, actualiza los productos afectados por el proveedor anterior"
+            ToastService.Notify(new(ToastType.Warning, $"Por favor, actualiza los productos afectados por el proveedor anterior"));
+            NavigationManager.NavigateTo("/Productos");
+
+        }
+        catch (Exception ex)
+        {
+            await Application.Current.MainPage.DisplayAlert("Error", "Fallo al conectarse a base de datos" + ex, "Ok");
+        }
+        finally
+        {
+            PreloadService.Hide();
+        }
+    }
+
 
 }

@@ -1,0 +1,80 @@
+﻿@page "/Empleados/Crear"
+@inject EmpleadosPGSQLContext Contexto
+@inject NavigationManager NavigationManager
+
+<TituloSolito Nombre="Crear Empleado" />
+
+<!--Formulario para crear un empleado-->
+
+<EditForm Model="@nuevoEmpleado" OnValidSubmit="RegistrarEmpleado">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="nombre_completo_empleado">Nombre Completo</label>
+        <InputText id="nombre_completo_empleado" class="form-control" @bind-Value="nuevoEmpleado.nombre_completo_empleado" />
+    </div>
+
+    <!--Campo para registrar el salario Diario-->
+    <div class="form-group">
+        <label for="salario_diario">Salario Diario</label>
+        <InputNumber id="salario_diario" class="form-control" @bind-Value="nuevoEmpleado.salario_diario" />
+    </div>
+
+    <!--Select para el tipo de empleado-->
+    <div class="form-group">
+        <label for="tipo_empleado_id">Tipo de Empleado</label>
+        <InputSelect id="tipo_empleado_id" class="form-control" @bind-Value="nuevoEmpleado.tipo_empleado_id">
+            @foreach (var tipoEmpleado in TiposDeEmpleado)
+            {
+                <option value="@tipoEmpleado.identificador_categoria">@tipoEmpleado.nombre_categoria</option>
+            }
+        </InputSelect>
+    </div>
+    <br />
+    <button type="submit" class="btn btn-primary">Crear</button>
+
+</EditForm>
+
+
+
+@code {
+    [Inject] PreloadService PreloadService { get; set; }
+    [Inject] ToastService ToastService { get; set; }
+    private Empleado nuevoEmpleado = new Empleado();
+    private List<TipoDeEmpleado> TiposDeEmpleado = new List<TipoDeEmpleado>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        PreloadService.Show(SpinnerColor.Primary);
+        try
+        {
+            TiposDeEmpleado = await Contexto.TiposDeEmpleado.Where(c => c.estado == EstadoRegistro.Activo).ToListAsync();
+            await Task.Delay(500);
+        }
+        catch (Exception ex)
+        {
+            await Application.Current.MainPage.DisplayAlert("Error", "Fallo al conectarse a base de datos" + ex, "Ok");
+        }
+        finally
+        {
+            PreloadService.Hide();
+        }
+    }
+
+    private async Task RegistrarEmpleado()
+    {
+        try
+        {
+            nuevoEmpleado.estado = EstadoRegistro.Activo;
+            await Contexto.Empleados.AddAsync(nuevoEmpleado);
+            await Contexto.SaveChangesAsync();
+            ToastService.Notify(new(ToastType.Success, $"Empleado creado con éxito"));
+            NavigationManager.NavigateTo("/Empleados");
+        }
+        catch (Exception ex)
+        {
+            await Application.Current.MainPage.DisplayAlert("Error", "Fallo al conectarse a base de datos" + ex, "Ok");
+        }
+    }
+}

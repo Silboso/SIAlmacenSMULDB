@@ -1,0 +1,164 @@
+﻿@page "/Clientes"
+@inject EmpleadosPGSQLContext Contexto
+@inject NavigationManager NavigationManager
+
+<TituloConAñadir Nombre="Clientes" Link="Clientes/Crear"></TituloConAñadir>
+
+<!--Espacio para busquedas por Nombre e ID-->
+<div class="row">
+    <div class="col-12 col-md-6">
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="basic-addon1"><i class="bi bi-search"></i></span>
+            <input type="text" class="form-control" placeholder="Buscar por nombre o ID" @bind="searchText" @oninput="HandleInput" />
+        </div>
+    </div>
+</div>
+
+<!--Tabla de Clientes-->
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Nombre</th>
+            <th>Direccion</th>
+            <th>Telefono</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var cliente in clientes.Skip((currentPageNumber - 1) * itemsPerPage).Take(itemsPerPage))
+        {
+            <tr>
+                <td>@cliente.identificador</td>
+                <td>@cliente.nombre_completo_cliente</td>
+                <td>@cliente.direccion</td>
+                <td>@cliente.telefono_contacto</td>
+                <td>
+                    <a class="btn btn-secondary" href="Clientes/Editar/@cliente.identificador">
+                        <i class="bi bi-pencil-square"></i>
+                    </a>
+                    <button class="btn btn-danger" @onclick="(() => EliminarCliente(cliente.identificador))">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Si no hay clientes, muestra un mensaje -->
+@if (clientes.Count == 0)
+{
+    <div class="alert alert-info" role="alert">
+        No hay Clientes
+    </div>
+}
+
+<div class="d-flex justify-content-center">
+    <!-- Agrega el componente de paginacion-->
+    <Pagination ActivePageNumber="@currentPageNumber"
+                TotalPages="totalPages"
+                PageChanged="OnPageChangedAsync"
+                FirstLinkIcon="IconName.ChevronDoubleLeft"
+                PreviousLinkIcon="IconName.ChevronLeft"
+                NextLinkIcon="IconName.ChevronRight"
+                LastLinkIcon="IconName.ChevronDoubleRight" />
+</div>
+
+@code {
+    //Esta pagina maneja una base de datos PostgreSQL
+    [Inject] protected PreloadService PreloadService { get; set; }
+    [Inject] protected ToastService ToastService { get; set; }
+    private List<Cliente> clientes = new List<Cliente>();
+    private string searchText = "";
+    private int currentPageNumber = 1;
+    private int itemsPerPage = 10;
+    private int totalPages => (int)Math.Ceiling(decimal.Divide(clientes.Count, itemsPerPage));
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        PreloadService.Show(SpinnerColor.Primary);
+        try
+        {
+            //Trae los clientes que tengan el estado activo organizados por ID
+            clientes = await Contexto.Clientes.Where(c => c.estado == EstadoRegistro.Activo).OrderBy(c => c.identificador).ToListAsync();
+            //Espera 1 segundo
+            await Task.Delay(500);
+        }
+        catch (Exception ex)
+        {
+            //await alerta
+            await Application.Current.MainPage.DisplayAlert("Error", ex.Message, "Ok");
+        }
+        finally
+        {
+            PreloadService.Hide();
+        }
+    }
+
+    private async void EliminarCliente(int id)
+    {
+        PreloadService.Show(SpinnerColor.Primary);
+        try
+        {
+            //Busca el cliente
+            var cliente = await Contexto.Clientes.FindAsync(id);
+            //Muestra una alerta de confirmacion
+            var confirm = await Application.Current.MainPage.DisplayAlert("Confirmación", "¿Está seguro de eliminar este cliente?", "Si", "No");
+            if (confirm)
+            {
+                //Lo elimina de forma logica
+                cliente.estado = EstadoRegistro.Inactivo;
+                //Guarda los cambios
+                await Contexto.SaveChangesAsync();
+                //Muestra el toast
+                ToastService.Notify(new(ToastType.Success, $"El cliente se ha eliminado correctamente"));
+                //Espera 1 segundo
+                await Task.Delay(500);
+                //Recarga la pagina
+                NavigationManager.NavigateTo("/Clientes", true);
+            }
+            else
+            {
+                //Espera 1 segundo
+                await Task.Delay(500);
+            }
+        }
+        catch
+        {
+
+        }
+        finally
+        {
+            PreloadService.Hide();
+        }
+
+    }
+
+    private void HandleInput(ChangeEventArgs e)
+    {
+        searchText = e.Value.ToString();
+        SearchClientes();
+    }
+
+    private void SearchClientes()
+    {
+        if (string.IsNullOrWhiteSpace(searchText))
+        {
+            //Trae los clientes que tengan el estado activo organizados por ID
+            clientes = Contexto.Clientes.Where(c => c.estado == EstadoRegistro.Activo).OrderBy(c => c.identificador).ToList();
+        }
+        else
+        {
+            //Trae los clientes que tengan el estado activo organizados por ID donde coincidan con el texto de busqueda
+            clientes = Contexto.Clientes.Where(c => c.estado == EstadoRegistro.Activo && c.nombre_completo_cliente.ToLower().Contains(searchText.ToLower())).OrderBy(c => c.identificador).ToList();
+        }
+    }
+
+    private async Task OnPageChangedAsync(int pageNumber)
+    {
+        currentPageNumber = pageNumber;
+        await Task.Delay(500);
+    }
+}

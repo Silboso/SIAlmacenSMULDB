@@ -1,0 +1,90 @@
+﻿@page "/Clientes/Editar/{id:int}"
+@inject EmpleadosPGSQLContext Contexto
+@inject NavigationManager NavigationManager
+
+<TituloSolito Nombre="Editar Cliente" />
+
+<!--Formulario para editar un cliente-->
+
+<EditForm Model="@cliente" OnValidSubmit="EditarCliente">
+
+    <DataAnnotationsValidator />
+
+    <ValidationSummary />
+
+    <div class="form-group">
+
+        <label for="nombre_completo_cliente">Nombre Completo</label>
+
+        <InputText id="nombre_completo_cliente" class="form-control" @bind-Value="cliente.nombre_completo_cliente" />
+
+    </div>
+
+    <div class="form-group">
+
+        <label for="direccion">Direccion</label>
+
+        <InputText id="direccion" class="form-control" @bind-Value="cliente.direccion" />
+
+    </div>
+
+    <div class="form-group">
+
+        <label for="telefono_contacto">Telefono</label>
+
+        <InputText id="telefono_contacto" class="form-control" @bind-Value="cliente.telefono_contacto" />
+
+    </div>
+
+    <br />
+    <button type="submit" class="btn btn-primary">Editar</button>
+</EditForm>
+
+
+@code {
+    [Inject] protected PreloadService PreloadService { get; set; }
+    [Inject] protected ToastService ToastService { get; set; }
+    [Parameter] public int id { get; set; }
+    private Cliente cliente = new Cliente();
+
+    protected override async Task OnInitializedAsync()
+    {
+        PreloadService.Show(SpinnerColor.Primary);
+        try
+        {
+            cliente = await Contexto.Clientes.FindAsync(id);
+        }
+        catch (Exception ex)
+        {
+            await Application.Current.MainPage.DisplayAlert("Error", "Fallo al conectarse a base de datos" + ex, "Ok");
+        }
+        finally
+        {
+            PreloadService.Hide();
+        }
+    }
+
+    private async Task EditarCliente()
+    {
+        PreloadService.Show(SpinnerColor.Primary);
+        try
+        {
+            Contexto.Clientes.Update(cliente);
+            await Contexto.SaveChangesAsync();
+            //Tostada de exito
+            ToastService.Notify(new(ToastType.Success, $"Editado con exito"));
+            NavigationManager.NavigateTo("/Clientes");
+        }
+        catch (Exception ex)
+        {
+            await Application.Current.MainPage.DisplayAlert("Error", "Fallo al conectarse a base de datos" + ex, "Ok");
+        }
+        finally
+        {
+            PreloadService.Hide();
+        }
+    }
+
+
+
+}

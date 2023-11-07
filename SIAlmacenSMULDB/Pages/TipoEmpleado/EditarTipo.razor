@@ -1,0 +1,68 @@
+﻿@page "/TipoEmpleado/Editar/{id:int}"
+@inject EmpleadosPGSQLContext Contexto
+@inject NavigationManager NavigationManager
+
+<TituloSolito Nombre="Editar Tipo de Empleado" />
+
+<!--Formulario para editar un tipo de empleado-->
+
+<EditForm Model="@tipoEmpleado" OnValidSubmit="GuardarCambios">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="form-group">
+        <label for="nombre_categoria">Nombre</label>
+        <InputText id="nombre_categoria" class="form-control" @bind-Value="tipoEmpleado.nombre_categoria" />
+    </div>
+    <br />
+    <button type="submit" class="btn btn-primary">Guardar</button>
+</EditForm>
+
+@code {
+    [Inject] protected PreloadService PreloadService { get; set; }
+    [Inject] protected ToastService ToastService { get; set; }
+    [Parameter] public int id { get; set; }
+    private TipoDeEmpleado tipoEmpleado = new TipoDeEmpleado();
+
+    protected override async Task OnInitializedAsync()
+    {
+        PreloadService.Show(SpinnerColor.Primary);
+        try
+        {
+            tipoEmpleado = await Contexto.TiposDeEmpleado.FindAsync(id);
+            //Espera 1 segundo
+            await Task.Delay(500);
+        }
+        catch (Exception ex)
+        {
+            await Application.Current.MainPage.DisplayAlert("Error", "No se pudo cargar el tipo de empleado", "Ok");
+        }
+        finally
+        {
+            PreloadService.Hide();
+        }
+    }
+
+    private async void GuardarCambios()
+    {
+        PreloadService.Show(SpinnerColor.Primary);
+        try
+        {
+            //Guarda los cambios
+            await Contexto.SaveChangesAsync();
+            //Alerta de exito
+            ToastService.Notify(new(ToastType.Success, $"El Tipo de empleado se ha editado correctamente"));
+            //Redirecciona a la pagina de tipos de empleado
+            NavigationManager.NavigateTo("/TipoEmpleado");
+        }
+        catch (Exception ex)
+        {
+            await Application.Current.MainPage.DisplayAlert("Error", "No se pudo editar el tipo de empleado", "Ok");
+        }
+        finally
+        {
+            PreloadService.Hide();
+        }
+    }
+
+
+}
