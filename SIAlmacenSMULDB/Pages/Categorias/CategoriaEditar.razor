@@ -19,7 +19,7 @@
                     <InputText id="Nombre" class="form-control" @bind-Value="categoria.Nombre" />
 
                     <ValidationMessage For="@(() => categoria.Nombre)" />
-                        <br/>
+                    <br />
                     <label for="Descripcion">Descripcion:</label>
 
                     <InputText id="Descripcion" class="form-control" @bind-Value="categoria.Descripcion" />
@@ -70,21 +70,31 @@
     private async Task EditarCategoria()
     {
         PreloadService.Show(SpinnerColor.Primary);
-        try
-        {
-            Contexto.CategoriasProductos.Update(categoria);
-            await Contexto.SaveChangesAsync();
-            //Tostada de confirmación
-            ToastService.Notify(new(ToastType.Warning, $"Editado con exito"));
-            NavigationManager.NavigateTo("/Categorias");
-        }
-        catch (Exception ex)
-        {
-            await Application.Current.MainPage.DisplayAlert("Error", "Fallo al conectarse a base de datos" + ex, "Ok");
-        }
-        finally
+        //Confirmacion de los cambios
+        var confirm = await Application.Current.MainPage.DisplayAlert("Confirmar", "¿Esta seguro que desea guardar los cambios hechos en esta categoria?", "Si", "No");
+        if (!confirm)
         {
             PreloadService.Hide();
+            return;
+        }
+        else
+        {
+            try
+            {
+                Contexto.CategoriasProductos.Update(categoria);
+                await Contexto.SaveChangesAsync();
+                //Tostada de confirmación
+                ToastService.Notify(new(ToastType.Warning, $"Editado con exito"));
+                NavigationManager.NavigateTo("/Categorias");
+            }
+            catch (Exception ex)
+            {
+                await Application.Current.MainPage.DisplayAlert("Error", "Fallo al conectarse a base de datos" + ex, "Ok");
+            }
+            finally
+            {
+                PreloadService.Hide();
+            }
         }
     }
 

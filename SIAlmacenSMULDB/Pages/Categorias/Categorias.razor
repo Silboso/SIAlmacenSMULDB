@@ -87,7 +87,7 @@
                 await Contexto.SaveChangesAsync();
                 //Tostada de confirmación
                 ToastService.Notify(new(ToastType.Warning, $"Eliminado con exito"));
-                categorias = await Contexto.CategoriasProductos.ToListAsync();
+                categorias = await Contexto.CategoriasProductos.Where(c => c.Estado == EstadoRegistro.Activo).ToListAsync();
                 //Actualiza todos los productos que tengan la categoria eliminada para que tengan la categoria 1002
                 var productos = await Contexto.Productos.Where(p => p.CategoriaID == CategoriaID).ToListAsync();
                 foreach (var producto in productos)
@@ -103,6 +103,8 @@
                 PreloadService.Hide();
                 //Redirigete a la misma pagina
                 NavigationManager.NavigateTo("/Categorias");
+                //Carga solo los productos con estado activo
+                categorias = await Contexto.CategoriasProductos.Where(c => c.Estado == EstadoRegistro.Activo).ToListAsync();
             }
             catch (Exception ex)
             {

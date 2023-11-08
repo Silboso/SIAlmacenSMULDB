@@ -18,24 +18,25 @@
                     <InputText id="Nombre" class="form-control" @bind-Value="producto.Nombre" />
                     <ValidationMessage For="@(() => producto.Nombre)" />
                 </div>
+                <br />
 
                 <div class="form-group">
                     <label for="Descripcion">Descripción:</label>
                     <InputText id="Descripcion" class="form-control" @bind-Value="producto.Descripcion" />
                 </div>
-
+                <br />
                 <div class="form-group">
                     <label for="Precio">Precio:</label>
                     <InputNumber id="Precio" class="form-control" @bind-Value="producto.Precio" />
                     <ValidationMessage For="@(() => producto.Precio)" />
                 </div>
-
+                <br />
                 <div class="form-group">
                     <label for="Stock">Stock:</label>
                     <InputNumber id="Stock" class="form-control" @bind-Value="producto.Stock" />
                     <ValidationMessage For="@(() => producto.Stock)" />
                 </div>
-
+                <br />
                 <!--Aquí va el select de categorías, solo se puede elegir una por producto-->
                 <div class="form-group">
                     <label for="CategoriaID">Categoría:</label>
@@ -47,13 +48,13 @@
                     </InputSelect>
                     <ValidationMessage For="@(() => producto.CategoriaID)" />
                 </div>
-
+                <br />
                 <div class="form-group">
                     <label for="CodigoBarra">Código de Barras:</label>
                     <InputText id="CodigoBarra" class="form-control" @bind-Value="producto.CodigoBarra" />
                     <ValidationMessage For="@(() => producto.CodigoBarra)" />
                 </div>
-
+                <br />
                 <!--Añadir URL de la imagen-->
                 <div class="form-group">
                     <label for="Imagen">URL Imagen:</label>
@@ -114,28 +115,38 @@
     private async Task EditarProducto()
     {
         PreloadService.Show(SpinnerColor.Primary);
-        try
+        //Confirma cambios
+        var confirmado = await Application.Current.MainPage.DisplayAlert("Confirmar", "¿Desea guardar los cambios?", "Si", "No");
+        if (!confirmado)
         {
-            //Actualiza el producto
-            Contexto.Productos.Update(producto);
-            await Contexto.SaveChangesAsync();
-            //Actualiza la lista de productos
-            productosProveedores = await Contexto.ProductosProveedores.Where(pp => pp.ProductoID == ProductoID && pp.Estado == EstadoRegistro.Activo).ToListAsync();
-            proveedores = await Contexto.Proveedores.ToListAsync();
-            //Actualiza la categoria del producto
-            categoria = await Contexto.CategoriasProductos.FindAsync(producto.CategoriaID);
-            //Refresca la interfaz
-            StateHasChanged();
-            //Espera 1 segundo
-            await Task.Delay(500);
             PreloadService.Hide();
-            //Tostada "El registro se actualizo con exito"
-            ToastService.Notify(new(ToastType.Success, $"Actualizado con exito"));
+            return;
         }
-        catch (Exception e)
+        else
         {
-            PreloadService.Hide();
-            await Application.Current.MainPage.DisplayAlert("Error", "Fallo al conectarse a base de datos" + e, "Ok");
+            try
+            {
+                //Actualiza el producto
+                Contexto.Productos.Update(producto);
+                await Contexto.SaveChangesAsync();
+                //Actualiza la lista de productos
+                productosProveedores = await Contexto.ProductosProveedores.Where(pp => pp.ProductoID == ProductoID && pp.Estado == EstadoRegistro.Activo).ToListAsync();
+                proveedores = await Contexto.Proveedores.ToListAsync();
+                //Actualiza la categoria del producto
+                categoria = await Contexto.CategoriasProductos.FindAsync(producto.CategoriaID);
+                //Refresca la interfaz
+                StateHasChanged();
+                //Espera 1 segundo
+                await Task.Delay(500);
+                PreloadService.Hide();
+                //Tostada "El registro se actualizo con exito"
+                ToastService.Notify(new(ToastType.Success, $"Actualizado con exito"));
+            }
+            catch (Exception e)
+            {
+                PreloadService.Hide();
+                await Application.Current.MainPage.DisplayAlert("Error", "Fallo al conectarse a base de datos" + e, "Ok");
+            }
         }
     }
 

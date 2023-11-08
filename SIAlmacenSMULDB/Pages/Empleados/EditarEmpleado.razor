@@ -21,7 +21,7 @@
                     <label for="nombre_completo_empleado">Nombre Completo</label>
                     <InputText id="nombre_completo_empleado" class="form-control" @bind-Value="empleado.nombre_completo_empleado" />
                 </div>
-                <br/>
+                <br />
                 <!--Campo salario Diario-->
                 <div class="form-group">
                     <label for="salario_diario">Salario Diario</label>
@@ -39,7 +39,9 @@
                     </InputSelect>
                 </div>
                 <br />
-                <button class="btn btn-primary" type="submit">Guardar</button>
+                <div class="d-flex justify-content-center text-center">
+                    <button class="btn btn-primary" type="submit">Guardar</button>
+                </div>
 
             </EditForm>
 
@@ -79,20 +81,30 @@
     private async void GuardarCambios()
     {
         PreloadService.Show(SpinnerColor.Primary);
-        try
-        {
-            Contexto.Empleados.Update(empleado);
-            await Contexto.SaveChangesAsync();
-            NavigationManager.NavigateTo("/Empleados");
-        }
-        catch (Exception ex)
-        {
-            await Application.Current.MainPage.DisplayAlert("Error", "Fallo al conectarse a base de datos" + ex, "Ok");
-        }
-        finally
+
+        //Confirmacion de cambios
+        var confirmacion = await Application.Current.MainPage.DisplayAlert("Confirmacion", "¿Desea guardar los cambios?", "Si", "No");
+        if (!confirmacion)
         {
             PreloadService.Hide();
+            return;
+        }
+        else
+        {
+            try
+            {
+                Contexto.Empleados.Update(empleado);
+                await Contexto.SaveChangesAsync();
+                NavigationManager.NavigateTo("/Empleados");
+            }
+            catch (Exception ex)
+            {
+                await Application.Current.MainPage.DisplayAlert("Error", "Fallo al conectarse a base de datos" + ex, "Ok");
+            }
+            finally
+            {
+                PreloadService.Hide();
+            }
         }
     }
-
-    }
+}

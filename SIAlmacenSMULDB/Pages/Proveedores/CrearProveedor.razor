@@ -15,20 +15,27 @@
             <div class="form-group">
                 <label for="Nombre">Nombre:</label>
                 <InputText id="Nombre" class="form-control" @bind-Value="nuevoProveedor.Nombre" />
+                <br />
                 <label for="Descripcion">Direccion:</label>
                 <InputText id="Descripcion" class="form-control" @bind-Value="nuevoProveedor.Direccion" />
+                <br />
                 <label for="Direccion">Telefono:</label>
                 <InputText id="Direccion" class="form-control" @bind-Value="nuevoProveedor.Telefono" />
+                <br />
                 <label for="Telefono">Email:</label>
                 <InputText id="Telefono" class="form-control" @bind-Value="nuevoProveedor.Email" />
+                <br />
                 <ValidationMessage For="@(() => nuevoProveedor.Nombre)" />
                 <label for="Contacto">Contacto:</label>
                 <InputText id="Contacto" class="form-control" @bind-Value="nuevoProveedor.Contacto" />
+                <br />
+
             </div>
 
             <br />
-
-            <button type="submit" class="btn btn-primary">Registrar</button>
+            <div class="d-flex justify-content-center text-center">
+                <button type="submit" class="btn btn-primary">Registrar</button>
+            </div>
 
         </EditForm>
     </div>

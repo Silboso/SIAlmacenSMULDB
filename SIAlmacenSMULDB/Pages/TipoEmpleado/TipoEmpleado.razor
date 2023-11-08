@@ -52,8 +52,8 @@
         PreloadService.Show(SpinnerColor.Primary);
         try
         {
-            //Trae los clientes que tengan el estado activo en orden por el id
-            tipoEmpleados = await Contexto.TiposDeEmpleado.Where(c => c.estado == EstadoRegistro.Activo).OrderBy(c => c.identificador_categoria).ToListAsync();
+            //Trae los clientes que tengan el estado activo en orden por el id, ignora el 11
+tipoEmpleados = await Contexto.TiposDeEmpleado.Where(c => c.estado == EstadoRegistro.Activo && c.identificador_categoria != 11).OrderBy(c => c.identificador_categoria).ToListAsync();
             //Espera 1 segundo
             await Task.Delay(500);
         }
@@ -73,39 +73,49 @@
     private async void EliminarTipoEmpleado(int id)
     {
         PreloadService.Show(SpinnerColor.Primary);
-        try
-        {
-            //Busca el cliente
-            var tipoEmpleado = await Contexto.TiposDeEmpleado.FindAsync(id);
-            //Cambia el estado a inactivo
-            tipoEmpleado.estado = EstadoRegistro.Inactivo;
-            //Guarda los cambios
-            await Contexto.SaveChangesAsync();
-            //Espera 1 segundo
-            await Task.Delay(500);
-            //Alerta tostado de eliminado
-            ToastService.Notify(new ToastMessage(ToastType.Success, $"El tipo de empleado se ha eliminado correctamente"));
-            //Busca todos los empleados que tengan el id del tipo de empleado
-            var empleados = await Contexto.Empleados.Where(e => e.tipo_empleado_id == id).ToListAsync();
-            //Actualiza el tipo de estos empleados al id 11 que es el tipo de empleado por defecto
-            empleados.ForEach(e => e.tipo_empleado_id = 11);
-            //Actualiza todos esos empleados en el contexto
-            Contexto.Empleados.UpdateRange(empleados);
-            //Guarda los cambios
-            await Contexto.SaveChangesAsync();
-            //Redirecciona a la pagina de Empleado
-            NavigationManager.NavigateTo("/TipoEmpleado", true);
-            //Muestra una tostada que solicite al usuario actualizar los empleados que fueron afectados
-            ToastService.Notify(new ToastMessage(ToastType.Warning, $"Se han actualizado los empleados que tenian el tipo de empleado eliminado"));
-        }
-        catch (Exception ex)
-        {
-            //Alerta de error de tipo app
-            await Application.Current.MainPage.DisplayAlert("Error", "No se pudo eliminar el tipo de empleado", "Ok");
-        }
-        finally
+        //Alerta de confirmacion
+        var confirm = await Application.Current.MainPage.DisplayAlert("Confirmar", "¿Esta seguro que desea eliminar el tipo de empleado?", "Si", "No");
+        //Si la respuesta es no, no hace nada
+        if (!confirm)
         {
             PreloadService.Hide();
+        }
+        else
+        {
+            try
+            {
+                //Busca el cliente
+                var tipoEmpleado = await Contexto.TiposDeEmpleado.FindAsync(id);
+                //Cambia el estado a inactivo
+                tipoEmpleado.estado = EstadoRegistro.Inactivo;
+                //Guarda los cambios
+                await Contexto.SaveChangesAsync();
+                //Espera 1 segundo
+                await Task.Delay(500);
+                //Alerta tostado de eliminado
+                ToastService.Notify(new ToastMessage(ToastType.Success, $"El tipo de empleado se ha eliminado correctamente"));
+                //Busca todos los empleados que tengan el id del tipo de empleado
+                var empleados = await Contexto.Empleados.Where(e => e.tipo_empleado_id == id).ToListAsync();
+                //Actualiza el tipo de estos empleados al id 11 que es el tipo de empleado por defecto
+                empleados.ForEach(e => e.tipo_empleado_id = 11);
+                //Actualiza todos esos empleados en el contexto
+                Contexto.Empleados.UpdateRange(empleados);
+                //Guarda los cambios
+                await Contexto.SaveChangesAsync();
+                //Redirecciona a la pagina de Empleado
+                NavigationManager.NavigateTo("/TipoEmpleado", true);
+                //Muestra una tostada que solicite al usuario actualizar los empleados que fueron afectados
+                ToastService.Notify(new ToastMessage(ToastType.Warning, $"Se han actualizado los empleados que tenian el tipo de empleado eliminado"));
+            }
+            catch (Exception ex)
+            {
+                //Alerta de error de tipo app
+                await Application.Current.MainPage.DisplayAlert("Error", "No se pudo eliminar el tipo de empleado", "Ok");
+            }
+            finally
+            {
+                PreloadService.Hide();
+            }
         }
     }
 

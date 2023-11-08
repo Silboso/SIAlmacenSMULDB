@@ -112,7 +112,7 @@
             //Trae los empleados que tengan el estado activo organizados por ID
             empleados = await Contexto.Empleados.Where(c => c.estado == EstadoRegistro.Activo).OrderBy(c => c.identificador).ToListAsync();
             //Trae los tipos de empleado que tengan el estado activo por ID
-            TiposDeEmpleado = await Contexto.TiposDeEmpleado.Where(c => c.estado == EstadoRegistro.Activo).OrderBy(c => c.identificador_categoria).ToListAsync();
+TiposDeEmpleado = await Contexto.TiposDeEmpleado.Where(c => c.estado == EstadoRegistro.Activo).OrderBy(c => c.identificador_categoria).ToListAsync();
             //Espera 1 segundo
             await Task.Delay(500);
         }
@@ -132,26 +132,36 @@
     private async void EliminarEmpleado(int id)
     {
         PreloadService.Show(SpinnerColor.Primary);
-        try
+        //Alerta de confirmacion
+        var confirm = await Application.Current.MainPage.DisplayAlert("Confirmación", "¿Está seguro de eliminar el empleado?", "Si", "No");
+        //Si se confirma
+        if (confirm)
         {
-            //Busca el empleado
-            var empleado = await Contexto.Empleados.FindAsync(id);
-            //Cambia el estado a inactivo
-            empleado.estado = EstadoRegistro.Inactivo;
-            //Guarda los cambios
-            await Contexto.SaveChangesAsync();
-            //Espera 1 segundo
-            await Task.Delay(500);
-            //Alerta tostado de eliminado
-            ToastService.Notify(new ToastMessage(ToastType.Success, $"El empleado se ha eliminado correctamente"));
-            //Redirecciona a la pagina de Empleado
-            NavigationManager.NavigateTo("/Empleados", true);
+            try
+            {
+                //Busca el empleado
+                var empleado = await Contexto.Empleados.FindAsync(id);
+                //Cambia el estado a inactivo
+                empleado.estado = EstadoRegistro.Inactivo;
+                //Guarda los cambios
+                await Contexto.SaveChangesAsync();
+                //Espera 1 segundo
+                await Task.Delay(500);
+                //Alerta tostado de eliminado
+                ToastService.Notify(new ToastMessage(ToastType.Success, $"El empleado se ha eliminado correctamente"));
+                //Redirecciona a la pagina de Empleado
+                NavigationManager.NavigateTo("/Empleados", true);
+            }
+            catch (Exception ex)
+            {
+                await Application.Current.MainPage.DisplayAlert("Error", "No se pudo eliminar el empleado" + ex, "Ok");
+            }
+            finally
+            {
+                PreloadService.Hide();
+            }
         }
-        catch (Exception ex)
-        {
-            await Application.Current.MainPage.DisplayAlert("Error", "No se pudo eliminar el empleado" + ex, "Ok");
-        }
-        finally
+        else
         {
             PreloadService.Hide();
         }

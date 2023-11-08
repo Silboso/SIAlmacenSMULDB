@@ -14,12 +14,14 @@
         <label for="nombre_completo_empleado">Nombre Completo</label>
         <InputText id="nombre_completo_empleado" class="form-control" @bind-Value="nuevoEmpleado.nombre_completo_empleado" />
     </div>
+    <br />
 
     <!--Campo para registrar el salario Diario-->
     <div class="form-group">
         <label for="salario_diario">Salario Diario</label>
         <InputNumber id="salario_diario" class="form-control" @bind-Value="nuevoEmpleado.salario_diario" />
     </div>
+    <br />
 
     <!--Select para el tipo de empleado-->
     <div class="form-group">
@@ -32,7 +34,9 @@
         </InputSelect>
     </div>
     <br />
-    <button type="submit" class="btn btn-primary">Crear</button>
+    <div class="d-flex justify-content-center text-center">
+        <button type="submit" class="btn btn-primary">Crear</button>
+    </div>
 
 </EditForm>
 

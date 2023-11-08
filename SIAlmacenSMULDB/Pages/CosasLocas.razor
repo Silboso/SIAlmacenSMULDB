@@ -33,7 +33,7 @@
 
 <div class="row">
 
-    @foreach (var producto in productos.Skip((currentPageNumber - 1) * itemsPerPage).Take(itemsPerPage))
+    @foreach (var producto in productos)
     {
 
         <div class="col-md-4 mb-4">
@@ -52,17 +52,6 @@
     </div>
 }
 
-<div class="d-flex justify-content-center">
-    <!-- Agrega el componente de paginación -->
-    <Pagination ActivePageNumber="@currentPageNumber"
-                TotalPages="totalPages"
-                PageChanged="OnPageChangedAsync"
-                FirstLinkIcon="IconName.ChevronDoubleLeft"
-                PreviousLinkIcon="IconName.ChevronLeft"
-                NextLinkIcon="IconName.ChevronRight"
-                LastLinkIcon="IconName.ChevronDoubleRight" />
-</div>
-
 
 @code {
     [Inject] protected PreloadService PreloadService { get; set; }
@@ -75,15 +64,18 @@
     private string searchText = "";
     int currentPageNumber = 1;
     int itemsPerPage = 9; // Define la cantidad de elementos por página
-    int totalPages => (int)Math.Ceiling(productos.Count / (double)itemsPerPage);
+    private List<Producto> filteredProducts = new List<Producto>(); 
+    int totalPages => (int)Math.Ceiling(filteredProducts.Count() / (double)itemsPerPage);
+
 
 
     // Se ejecuta cuando se cambia de página
     private async Task OnPageChangedAsync(int newPageNumber)
     {
         currentPageNumber = newPageNumber;
-        StateHasChanged(); // Asegúrate de forzar la actualización de la interfaz de usuario
+        StateHasChanged();
     }
+
 
 
 
@@ -159,19 +151,24 @@
     private void FilterProductosByCategoria(int categoriaID)
     {
         selectedCategoriaID = categoriaID;
-        // Filtra la lista de productos según la categoría seleccionada
         if (categoriaID == 0)
         {
-            // Muestra todos los productos
-            productos = Contexto.Productos.Where(p => p.Estado == EstadoRegistro.Activo).ToList();
+            // Filtra los productos en función de la búsqueda actual
+            filteredProducts = Contexto.Productos
+                .Where(p => p.Estado == EstadoRegistro.Activo && (string.IsNullOrEmpty(searchText) || p.Nombre.Contains(searchText) || p.CodigoBarra.Contains(searchText)))
+                .ToList();
         }
         else
         {
-            // Muestra solo los productos de la categoría seleccionada
-            productos = Contexto.Productos.Where(p => p.Estado == EstadoRegistro.Activo && p.CategoriaID == categoriaID).ToList();
+            // Filtra los productos en función de la categoría y la búsqueda actual
+            filteredProducts = Contexto.Productos
+                .Where(p => p.Estado == EstadoRegistro.Activo && p.CategoriaID == categoriaID && (string.IsNullOrEmpty(searchText) || p.Nombre.Contains(searchText) || p.CodigoBarra.Contains(searchText)))
+                .ToList();
         }
+        currentPageNumber = 1; // Vuelve a la página 1 cuando cambias la categoría
         StateHasChanged();
     }
+
 
     private string GetSelectedCategoriaText()
     {

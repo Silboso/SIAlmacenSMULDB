@@ -7,38 +7,38 @@
 <!--Tabla que contiene los proveedores-->
 <div class="container">
     <div class="col-sm-2"></div>
-    
-        <table class="table table-striped">
-            <thead>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Contacto</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var proveedor in proveedores)
+            {
                 <tr>
-                    <th>Nombre</th>
-                    <th>Contacto</th>
-                    <th>Acciones</th>
+                    <td>@proveedor.Nombre</td>
+                    <td>@proveedor.Contacto</td>
+                    <td>
+                        <!--Boton informacion-->
+                        <a class="btn btn-primary" href="Proveedores/Info/@proveedor.ProveedorID">
+                            <i class="bi bi-info"></i>
+                        </a>
+                        <a class="btn btn-secondary" href="Proveedores/Editar/@proveedor.ProveedorID">
+                            <i class="bi bi-pencil-square"></i>
+                        </a>
+                        <button class="btn btn-danger" @onclick="() => EliminarProveedor(proveedor.ProveedorID)">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
                 </tr>
-            </thead>
-            <tbody>
-                @foreach (var proveedor in proveedores)
-                {
-                    <tr>
-                        <td>@proveedor.Nombre</td>
-                        <td>@proveedor.Contacto</td>
-                        <td>
-                            <!--Boton informacion-->
-                            <a class="btn btn-primary" href="Proveedores/Info/@proveedor.ProveedorID">
-                                <i class="bi bi-info"></i>
-                            </a>
-                            <a class="btn btn-secondary" href="Proveedores/Editar/@proveedor.ProveedorID">
-                                <i class="bi bi-pencil-square"></i>
-                            </a>
-                            <button class="btn btn-danger" @onclick="() => EliminarProveedor(proveedor.ProveedorID)">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    
+            }
+        </tbody>
+    </table>
+
 </div>
 
 
@@ -70,25 +70,35 @@
     private async void EliminarProveedor(int id)
     {
         PreloadService.Show(SpinnerColor.Primary);
-        try
-        {
-            var proveedor = await Contexto.Proveedores.FirstOrDefaultAsync(p => p.ProveedorID == id);
-            proveedor.Estado = EstadoRegistro.Inactivo;
-            Contexto.Proveedores.Update(proveedor);
-            await Contexto.SaveChangesAsync();
-            ToastService.Notify(new(ToastType.Warning, $"Eliminado con exito"));
-            //Tostada que notifique "Por favor, actualiza los productos afectados por el proveedor anterior"
-            ToastService.Notify(new(ToastType.Warning, $"Por favor, actualiza los productos afectados por el proveedor anterior"));
-            NavigationManager.NavigateTo("/Productos");
-
-        }
-        catch (Exception ex)
-        {
-            await Application.Current.MainPage.DisplayAlert("Error", "Fallo al conectarse a base de datos" + ex, "Ok");
-        }
-        finally
+        //Confirmacion
+        var confirm = await Application.Current.MainPage.DisplayAlert("Eliminar", "¿Estas seguro de eliminar este proveedor?", "Si", "No");
+        if (!confirm)
         {
             PreloadService.Hide();
+        }
+        else
+        {
+            try
+            {
+                var proveedor = await Contexto.Proveedores.FirstOrDefaultAsync(p => p.ProveedorID == id);
+                proveedor.Estado = EstadoRegistro.Inactivo;
+                Contexto.Proveedores.Update(proveedor);
+                await Contexto.SaveChangesAsync();
+                ToastService.Notify(new(ToastType.Warning, $"Eliminado con exito"));
+                //Tostada que notifique "Por favor, actualiza los productos afectados por el proveedor anterior"
+                ToastService.Notify(new(ToastType.Warning, $"Por favor, actualiza los productos afectados por el proveedor anterior"));
+                NavigationManager.NavigateTo("/Productos");
+
+            }
+            catch (Exception ex)
+            {
+                await Application.Current.MainPage.DisplayAlert("Error", "Fallo al conectarse a base de datos" + ex, "Ok");
+            }
+
+            finally
+            {
+                PreloadService.Hide();
+            }
         }
     }
 

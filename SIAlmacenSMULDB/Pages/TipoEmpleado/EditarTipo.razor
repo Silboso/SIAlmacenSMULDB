@@ -17,7 +17,9 @@
                     <InputText id="nombre_categoria" class="form-control" @bind-Value="tipoEmpleado.nombre_categoria" />
                 </div>
                 <br />
-                <button type="submit" class="btn btn-primary">Guardar</button>
+                <div class="d-flex justify-content-center text-center">
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
             </EditForm>
         </div>
     </div>
@@ -51,22 +53,32 @@
     private async void GuardarCambios()
     {
         PreloadService.Show(SpinnerColor.Primary);
-        try
-        {
-            //Guarda los cambios
-            await Contexto.SaveChangesAsync();
-            //Alerta de exito
-            ToastService.Notify(new(ToastType.Success, $"El Tipo de empleado se ha editado correctamente"));
-            //Redirecciona a la pagina de tipos de empleado
-            NavigationManager.NavigateTo("/TipoEmpleado");
-        }
-        catch (Exception ex)
-        {
-            await Application.Current.MainPage.DisplayAlert("Error", "No se pudo editar el tipo de empleado", "Ok");
-        }
-        finally
+        //Confirmar cambios
+        var confirmado = await Application.Current.MainPage.DisplayAlert("Confirmar", "¿Desea editar el tipo de empleado?", "Si", "No");
+        if (!confirmado)
         {
             PreloadService.Hide();
+            return;
+        }
+        else
+        {
+            try
+            {
+                //Guarda los cambios
+                await Contexto.SaveChangesAsync();
+                //Alerta de exito
+                ToastService.Notify(new(ToastType.Success, $"El Tipo de empleado se ha editado correctamente"));
+                //Redirecciona a la pagina de tipos de empleado
+                NavigationManager.NavigateTo("/TipoEmpleado");
+            }
+            catch (Exception ex)
+            {
+                await Application.Current.MainPage.DisplayAlert("Error", "No se pudo editar el tipo de empleado", "Ok");
+            }
+            finally
+            {
+                PreloadService.Hide();
+            }
         }
     }
 

@@ -42,7 +42,10 @@ namespace SIAlmacenSMULDB.ModelsSQL
         [StringLength(13, MinimumLength = 13)]
         //Solo aecpta numeros y guiones
         [RegularExpression(@"^[0-9\-]*$")]
+
         public string CodigoBarra { get; set; }
+        //Tamaño maximo de 255 caracteres
+        [StringLength(255)]
         public string URLImagen { get; set; }
     }
 }

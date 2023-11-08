@@ -21,30 +21,35 @@
                     <InputText id="Nombre" class="form-control" @bind-Value="proveedor.Nombre" />
 
                     <ValidationMessage For="@(() => proveedor.Nombre)" />
+                    <br />
 
                     <label for="Descripcion">Direccion:</label>
 
                     <InputText id="Descripcion" class="form-control" @bind-Value="proveedor.Direccion" />
 
                     <ValidationMessage For="@(() => proveedor.Direccion)" />
+                    <br />
 
                     <label for="Direccion">Telefono:</label>
 
                     <InputText id="Direccion" class="form-control" @bind-Value="proveedor.Telefono" />
 
                     <ValidationMessage For="@(() => proveedor.Telefono)" />
+                    <br />
 
                     <label for="Telefono">Email:</label>
 
                     <InputText id="Telefono" class="form-control" @bind-Value="proveedor.Email" />
 
                     <ValidationMessage For="@(() => proveedor.Email)" />
+                    <br />
 
                     <label for="Contacto">Contacto:</label>
 
                     <InputText id="Contacto" class="form-control" @bind-Value="proveedor.Contacto" />
 
                     <ValidationMessage For="@(() => proveedor.Contacto)" />
+                    <br />
 
                 </div>
 
@@ -86,21 +91,31 @@
     private async Task EditarProveedor()
     {
         PreloadService.Show(SpinnerColor.Primary);
-        try
-        {
-            Contexto.Proveedores.Update(proveedor);
-            await Contexto.SaveChangesAsync();
-            //Tostada de confirmación
-            ToastService.Notify(new ToastMessage(ToastType.Warning, $"Editado con exito"));
-            NavigationManager.NavigateTo("/Proveedores");
-        }
-        catch (Exception ex)
-        {
-            await Application.Current.MainPage.DisplayAlert("Error", "Fallo al conectarse a base de datos" + ex, "Ok");
-        }
-        finally
+        //Confirmar cambios
+        var confirmado = await Application.Current.MainPage.DisplayAlert("Confirmar", "¿Desea editar el proveedor?", "Si", "No");
+        if (!confirmado)
         {
             PreloadService.Hide();
+            return;
+        }
+        else
+        {
+            try
+            {
+                Contexto.Proveedores.Update(proveedor);
+                await Contexto.SaveChangesAsync();
+                //Tostada de confirmación
+                ToastService.Notify(new ToastMessage(ToastType.Warning, $"Editado con exito"));
+                NavigationManager.NavigateTo("/Proveedores");
+            }
+            catch (Exception ex)
+            {
+                await Application.Current.MainPage.DisplayAlert("Error", "Fallo al conectarse a base de datos" + ex, "Ok");
+            }
+            finally
+            {
+                PreloadService.Hide();
+            }
         }
     }
 

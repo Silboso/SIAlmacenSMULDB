@@ -14,18 +14,23 @@
         <label for="nombre_completo_cliente">Nombre Completo</label>
         <InputText id="nombre_completo_cliente" class="form-control" @bind-Value="nuevoCliente.nombre_completo_cliente" />
     </div>
+    <br />
 
     <div class="form-group">
         <label for="direccion">Direccion</label>
         <InputText id="direccion" class="form-control" @bind-Value="nuevoCliente.direccion" />
     </div>
+    <br />
 
     <div class="form-group">
         <label for="telefono_contacto">Telefono</label>
         <InputText id="telefono_contacto" class="form-control" @bind-Value="nuevoCliente.telefono_contacto" />
     </div>
+    <br />
 
-    <button type="submit" class="btn btn-primary">Crear</button>
+    <div class="d-flex justify-content-center text-center">
+        <button type="submit" class="btn btn-primary">Crear</button>
+    </div>
 </EditForm>
 
 
@@ -73,7 +78,7 @@
             ToastService.Notify(new(ToastType.Success, $"El cliente se ha creado correctamente"));
             //Redirecciona a la pagina de clientes
             NavigationManager.NavigateTo("/Clientes");
-            
+
         }
         catch (Exception ex)
         {

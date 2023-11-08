@@ -15,8 +15,11 @@
         <label for="nombre_categoria">Nombre</label>
         <InputText id="nombre_categoria" class="form-control" @bind-Value="nuevoTipo.nombre_categoria" />
     </div>
+    <br />
 
-    <button type="submit" class="btn btn-primary">Crear</button>
+    <div class="d-flex justify-content-center text-center">
+        <button type="submit" class="btn btn-primary">Crear</button>
+    </div>
 
 </EditForm>
 
@@ -26,7 +29,7 @@
     [Inject] protected ToastService ToastService { get; set; }
     private TipoDeEmpleado nuevoTipo = new TipoDeEmpleado();
 
-protected override async Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
         PreloadService.Show(SpinnerColor.Primary);
         try
@@ -45,7 +48,7 @@ protected override async Task OnInitializedAsync()
         }
     }
 
-private async void RegistrarTipo()
+    private async void RegistrarTipo()
     {
         PreloadService.Show(SpinnerColor.Primary);
         try

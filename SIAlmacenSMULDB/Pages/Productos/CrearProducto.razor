@@ -12,112 +12,121 @@
 <div class="container">
     <div class="col-sm-2"></div>
     <div class="col-sm-8">
-    <EditForm Model="@nuevoProducto" OnValidSubmit="RegistrarProducto">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
+        <EditForm Model="@nuevoProducto" OnValidSubmit="RegistrarProducto">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
 
-        <div class="form-group">
-            <label for="Nombre">Nombre del Producto:</label>
-            <InputText id="Nombre" class="form-control" @bind-Value="nuevoProducto.Nombre" />
-            <ValidationMessage For="@(() => nuevoProducto.Nombre)" />
-        </div>
+            <div class="form-group">
+                <label for="Nombre">Nombre del Producto:</label>
+                <InputText id="Nombre" class="form-control" @bind-Value="nuevoProducto.Nombre" />
+                <ValidationMessage For="@(() => nuevoProducto.Nombre)" />
+            </div>
+            <br />
 
-        <div class="form-group">
-            <label for="Descripcion">Descripción:</label>
-            <InputText id="Descripcion" class="form-control" @bind-Value="nuevoProducto.Descripcion" />
-        </div>
+            <div class="form-group">
+                <label for="Descripcion">Descripción:</label>
+                <InputText id="Descripcion" class="form-control" @bind-Value="nuevoProducto.Descripcion" />
+            </div>
+            <br />
 
-        <div class="form-group">
-            <label for="Precio">Precio:</label>
-            <InputNumber id="Precio" class="form-control" @bind-Value="nuevoProducto.Precio" />
-            <ValidationMessage For="@(() => nuevoProducto.Precio)" />
-        </div>
+            <div class="form-group">
+                <label for="Precio">Precio:</label>
+                <InputNumber id="Precio" class="form-control" @bind-Value="nuevoProducto.Precio" />
+                <ValidationMessage For="@(() => nuevoProducto.Precio)" />
+            </div>
+            <br />
 
-        <div class="form-group">
-            <label for="Stock">Stock:</label>
-            <InputNumber id="Stock" class="form-control" @bind-Value="nuevoProducto.Stock" />
-            <ValidationMessage For="@(() => nuevoProducto.Stock)" />
-        </div>
+            <div class="form-group">
+                <label for="Stock">Stock:</label>
+                <InputNumber id="Stock" class="form-control" @bind-Value="nuevoProducto.Stock" />
+                <ValidationMessage For="@(() => nuevoProducto.Stock)" />
+            </div>
+            <br />
 
-        <!-- Aquí va el select de categorías, solo se puede elegir una por producto-->
-        <div class="form-group">
-            <label for="CategoriaID">Categoría:</label>
-            <InputSelect id="CategoriaID" class="form-control" @bind-Value="nuevoProducto.CategoriaID">
-                @foreach (var categoria in categorias)
-                {
-                    <option value="@categoria.CategoriaID">@categoria.Nombre</option>
-                }
-            </InputSelect>
-            <ValidationMessage For="@(() => nuevoProducto.CategoriaID)" />
-        </div>
+            <!-- Aquí va el select de categorías, solo se puede elegir una por producto-->
+            <div class="form-group">
+                <label for="CategoriaID">Categoría:</label>
+                <InputSelect id="CategoriaID" class="form-control" @bind-Value="nuevoProducto.CategoriaID">
+                    @foreach (var categoria in categorias)
+                    {
+                        <option value="@categoria.CategoriaID">@categoria.Nombre</option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="@(() => nuevoProducto.CategoriaID)" />
+            </div>
+            <br />
 
-        <div class="form-group">
-            <label for="CodigoBarra">Código de Barras:</label>
-            <InputText id="CodigoBarra" class="form-control" @bind-Value="nuevoProducto.CodigoBarra" />
-            <ValidationMessage For="@(() => nuevoProducto.CodigoBarra)" />
-        </div>
-        <!-- Añadir URL de la imagen-->
-        <div class="form-group">
-            <label for="Imagen">URL Imagen:</label>
-            <InputText id="Imagen" class="form-control" @bind-Value="nuevoProducto.URLImagen" />
-            <ValidationMessage For="@(() => nuevoProducto.URLImagen)" />
-        </div>
-        <!-- Formulario de selección de proveedores, se puede elegir uno o varios-->
-        <!-- Cuando se selecciona uno, solo se muestra su nombre, al presionar un boton de + al lado-->
-        <!-- Este se añade a la lista de seleccionados-->
-        <!-- Cuando se presiona el boton de - se elimina de la lista de seleccionados-->
-        <div class="form-group">
-            <label for="Proveedores">Proveedores:</label>
-            <div class="row">
-                <div class="col-6">
-                    <InputSelect id="Proveedores" class="form-control" @bind-Value="nuevoProductoProveedor.ProveedorID">
-                        @foreach (var proveedor in proveedores)
-                        {
-                            <option value="@proveedor.ProveedorID">@proveedor.Nombre</option>
-                        }
-                    </InputSelect>
+            <div class="form-group">
+                <label for="CodigoBarra">Código de Barras:</label>
+                <InputText id="CodigoBarra" class="form-control" @bind-Value="nuevoProducto.CodigoBarra" />
+                <ValidationMessage For="@(() => nuevoProducto.CodigoBarra)" />
+            </div>
+            <br />
+            <!-- Añadir URL de la imagen-->
+            <div class="form-group">
+                <label for="Imagen">URL Imagen:</label>
+                <InputText id="Imagen" class="form-control" @bind-Value="nuevoProducto.URLImagen" />
+                <ValidationMessage For="@(() => nuevoProducto.URLImagen)" />
+            </div>
+            <br />
+            <!-- Formulario de selección de proveedores, se puede elegir uno o varios-->
+            <!-- Cuando se selecciona uno, solo se muestra su nombre, al presionar un boton de + al lado-->
+            <!-- Este se añade a la lista de seleccionados-->
+            <!-- Cuando se presiona el boton de - se elimina de la lista de seleccionados-->
+            <div class="form-group">
+                <label for="Proveedores">Proveedores:</label>
+                <div class="row">
+                    <div class="col-6">
+                        <InputSelect id="Proveedores" class="form-control" @bind-Value="nuevoProductoProveedor.ProveedorID">
+                            @foreach (var proveedor in proveedores)
+                            {
+                                <option value="@proveedor.ProveedorID">@proveedor.Nombre</option>
+                            }
+                        </InputSelect>
+                    </div>
+                    <div class="col-6">
+                        <button type="button" class="btn btn-primary" @onclick="() => añadirProveedor(nuevoProductoProveedor.ProveedorID)">+</button>
+                    </div>
                 </div>
-                <div class="col-6">
-                    <button type="button" class="btn btn-primary" @onclick="() => añadirProveedor(nuevoProductoProveedor.ProveedorID)">+</button>
+                <!--Tabla de proveedores actuales-->
+                @if (proveedoresSeleccionados.Any())
+                {
+                    <div class="form-group">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>ID del Proveedor</th>
+                                    <th>Nombre del Proveedor</th>
+                                    <th>Eliminar</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var proveedorID in proveedoresSeleccionados)
+                                {
+                                    var proveedor = proveedores.FirstOrDefault(p => p.ProveedorID == proveedorID);
+                                    if (proveedor != null)
+                                    {
+                                        <tr>
+                                            <td>@proveedor.ProveedorID</td>
+                                            <td>@proveedor.Nombre</td>
+                                            <td>
+                                                <button type="button" class="btn btn-danger" @onclick="() => EliminarProveedorSeleccionado(proveedorID)">Eliminar</button>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+
+                <!-- Añade un espacio-->
+                <br />
+                <div class="d-flex justify-content-center text-center">
+                    <button type="submit" class="btn btn-primary">Registrar Producto</button>
                 </div>
             </div>
-            <!--Tabla de proveedores actuales-->
-            @if (proveedoresSeleccionados.Any())
-            {
-                <div class="form-group">
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>ID del Proveedor</th>
-                                <th>Nombre del Proveedor</th>
-                                <th>Eliminar</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var proveedorID in proveedoresSeleccionados)
-                            {
-                                var proveedor = proveedores.FirstOrDefault(p => p.ProveedorID == proveedorID);
-                                if (proveedor != null)
-                                {
-                                    <tr>
-                                        <td>@proveedor.ProveedorID</td>
-                                        <td>@proveedor.Nombre</td>
-                                        <td>
-                                            <button type="button" class="btn btn-danger" @onclick="() => EliminarProveedorSeleccionado(proveedorID)">Eliminar</button>
-                                        </td>
-                                    </tr>
-                                }
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            }
-        
-        <!-- Añade un espacio-->
-        <br />
-        <button type="submit" class="btn btn-primary">Registrar Producto</button>
-        </div>
-    </EditForm>
+        </EditForm>
     </div>
 </div>
 
@@ -163,38 +172,57 @@
         try
         {
             // Agregar el producto a la base de datos
-            nuevoProducto.Estado = EstadoRegistro.Activo; // Estado activo
-            Contexto.Productos.Add(nuevoProducto);
+            try
+            {
+                nuevoProducto.Estado = EstadoRegistro.Activo; // Estado activo
+                Contexto.Productos.Add(nuevoProducto);
+                await Contexto.SaveChangesAsync(); // Save changes to get the generated ProductoID
+            }
+            catch (Exception e)
+            {
+                await Application.Current.MainPage.DisplayAlert("Error", "Fallo al registrar el producto: " + e.Message, "Ok");
+                return;
+            }
 
-            // Guardar los cambios en la base de datos
-            await Contexto.SaveChangesAsync();
-
-            // Registrar ProductoProveedor para cada proveedor seleccionado
+            // Now that the product has been successfully inserted and ProductoID is available, proceed to insert ProductoProveedor records.
             foreach (var proveedorID in proveedoresSeleccionados)
             {
                 var productoProveedor = new ProductoProveedor
                     {
-                        ProductoID = nuevoProducto.ProductoID, // Asigna el ID del producto recién registrado
+                        ProductoID = nuevoProducto.ProductoID, // Use the ProductoID generated in the previous step
                         ProveedorID = proveedorID,
                         Estado = EstadoRegistro.Activo // Estado activo
                     };
                 Contexto.ProductosProveedores.Add(productoProveedor);
             }
 
-            // Guardar los cambios en la base de datos para los ProductoProveedor
+            // Save changes to insert ProductoProveedor records
             await Contexto.SaveChangesAsync();
-            StateHasChanged();
-            // Mostrar tostada de éxito
-            ToastService.Notify(new(ToastType.Success, $"Producto Añadido"));
-            // Redirigir a la página de productos
+
+            // Show success toast and redirect
+            ToastService.Notify(new ToastMessage(ToastType.Success, "Producto Añadido"));
             NavigationManager.NavigateTo("/Productos");
+        }
+        catch (DbUpdateException dbUpdateException)
+        {
+            // Handle database update exceptions
+            var innerException = dbUpdateException.InnerException;
+            if (innerException != null)
+            {
+                await Application.Current.MainPage.DisplayAlert("Error", "Database update error: " + innerException.Message, "Ok");
+            }
+            else
+            {
+                await Application.Current.MainPage.DisplayAlert("Error", "Database update error: " + dbUpdateException.Message, "Ok");
+            }
         }
         catch (Exception e)
         {
-            // Maneja los errores apropiadamente
+            // Handle other exceptions
             await Application.Current.MainPage.DisplayAlert("Error", "Fallo al registrar el producto: " + e.Message, "Ok");
         }
     }
+
 
     private void EliminarProveedorSeleccionado(int proveedorID)
     {
@@ -212,6 +240,5 @@
             Application.Current.MainPage.DisplayAlert("Error", "El proveedor ya ha sido seleccionado", "Ok");
         }
     }
-
 }
 

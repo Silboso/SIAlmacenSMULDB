@@ -41,7 +41,9 @@
                 </div>
 
                 <br />
-                <button type="submit" class="btn btn-primary">Editar</button>
+                <div class="d-flex justify-content-center text-center">
+                    <button type="submit" class="btn btn-primary">Editar</button>
+                </div>
             </EditForm>
 
         </div>
@@ -75,21 +77,31 @@
     private async Task EditarCliente()
     {
         PreloadService.Show(SpinnerColor.Primary);
-        try
-        {
-            Contexto.Clientes.Update(cliente);
-            await Contexto.SaveChangesAsync();
-            //Tostada de exito
-            ToastService.Notify(new(ToastType.Success, $"Editado con exito"));
-            NavigationManager.NavigateTo("/Clientes");
-        }
-        catch (Exception ex)
-        {
-            await Application.Current.MainPage.DisplayAlert("Error", "Fallo al conectarse a base de datos" + ex, "Ok");
-        }
-        finally
+        //Confirmar cambios
+        var confirm = await Application.Current.MainPage.DisplayAlert("Confirmar", "¿Desea guardar los cambios?", "Si", "No");
+        if (!confirm)
         {
             PreloadService.Hide();
+            return;
+        }
+        else
+        {
+            try
+            {
+                Contexto.Clientes.Update(cliente);
+                await Contexto.SaveChangesAsync();
+                //Tostada de exito
+                ToastService.Notify(new(ToastType.Success, $"Editado con exito"));
+                NavigationManager.NavigateTo("/Clientes");
+            }
+            catch (Exception ex)
+            {
+                await Application.Current.MainPage.DisplayAlert("Error", "Fallo al conectarse a base de datos" + ex, "Ok");
+            }
+            finally
+            {
+                PreloadService.Hide();
+            }
         }
     }
 
