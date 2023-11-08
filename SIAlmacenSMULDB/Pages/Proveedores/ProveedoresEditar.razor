@@ -3,51 +3,60 @@
 @inject NavigationManager NavigationManager
 
 <TituloSolito Nombre="Editar Proveedor"></TituloSolito>
-<EditForm Model="proveedor" OnValidSubmit="EditarProveedor">
 
-    <DataAnnotationsValidator />
+<div class="container">
+    <div class="row">
+        <div class="col-sm-2"></div>
+        <div class="col-sm-8">
+            <EditForm Model="proveedor" OnValidSubmit="EditarProveedor">
 
-    <ValidationSummary />
+                <DataAnnotationsValidator />
 
-    <div class="form-group">
+                <ValidationSummary />
 
-        <label for="Nombre">Nombre:</label>
+                <div class="form-group">
 
-        <InputText id="Nombre" class="form-control" @bind-Value="proveedor.Nombre" />
+                    <label for="Nombre">Nombre:</label>
 
-        <ValidationMessage For="@(() => proveedor.Nombre)" />
+                    <InputText id="Nombre" class="form-control" @bind-Value="proveedor.Nombre" />
 
-        <label for="Descripcion">Direccion:</label>
+                    <ValidationMessage For="@(() => proveedor.Nombre)" />
 
-        <InputText id="Descripcion" class="form-control" @bind-Value="proveedor.Direccion" />
+                    <label for="Descripcion">Direccion:</label>
 
-        <ValidationMessage For="@(() => proveedor.Direccion)" />
+                    <InputText id="Descripcion" class="form-control" @bind-Value="proveedor.Direccion" />
 
-        <label for="Direccion">Telefono:</label>
+                    <ValidationMessage For="@(() => proveedor.Direccion)" />
 
-        <InputText id="Direccion" class="form-control" @bind-Value="proveedor.Telefono" />
+                    <label for="Direccion">Telefono:</label>
 
-        <ValidationMessage For="@(() => proveedor.Telefono)" />
+                    <InputText id="Direccion" class="form-control" @bind-Value="proveedor.Telefono" />
 
-        <label for="Telefono">Email:</label>
+                    <ValidationMessage For="@(() => proveedor.Telefono)" />
 
-        <InputText id="Telefono" class="form-control" @bind-Value="proveedor.Email" />
+                    <label for="Telefono">Email:</label>
 
-        <ValidationMessage For="@(() => proveedor.Email)" />
+                    <InputText id="Telefono" class="form-control" @bind-Value="proveedor.Email" />
 
-        <label for="Contacto">Contacto:</label>
+                    <ValidationMessage For="@(() => proveedor.Email)" />
 
-        <InputText id="Contacto" class="form-control" @bind-Value="proveedor.Contacto" />
+                    <label for="Contacto">Contacto:</label>
 
-        <ValidationMessage For="@(() => proveedor.Contacto)" />
+                    <InputText id="Contacto" class="form-control" @bind-Value="proveedor.Contacto" />
 
+                    <ValidationMessage For="@(() => proveedor.Contacto)" />
+
+                </div>
+
+                <br />
+                <div class="d-flex justify-content-center text-center">
+                    <button type="submit" class="btn btn-primary">Editar</button>
+                </div>
+
+            </EditForm>
+        </div>
     </div>
-
-    <br />
-
-    <button type="submit" class="btn btn-primary">Editar</button>
-
-</EditForm>
+</div>
 
 @code {
     [Inject] protected PreloadService PreloadService { get; set; }

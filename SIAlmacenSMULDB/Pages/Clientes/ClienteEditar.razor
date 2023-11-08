@@ -6,39 +6,47 @@
 
 <!--Formulario para editar un cliente-->
 
-<EditForm Model="@cliente" OnValidSubmit="EditarCliente">
+<div class="container">
+    <div class="row">
+        <div class="col-sm-2"></div>
+        <div class="col-sm-8">
+            <EditForm Model="@cliente" OnValidSubmit="EditarCliente">
 
-    <DataAnnotationsValidator />
+                <DataAnnotationsValidator />
 
-    <ValidationSummary />
+                <ValidationSummary />
 
-    <div class="form-group">
+                <div class="form-group">
 
-        <label for="nombre_completo_cliente">Nombre Completo</label>
+                    <label for="nombre_completo_cliente">Nombre Completo</label>
 
-        <InputText id="nombre_completo_cliente" class="form-control" @bind-Value="cliente.nombre_completo_cliente" />
+                    <InputText id="nombre_completo_cliente" class="form-control" @bind-Value="cliente.nombre_completo_cliente" />
 
+                </div>
+                <br />
+                <div class="form-group">
+
+                    <label for="direccion">Direccion</label>
+
+                    <InputText id="direccion" class="form-control" @bind-Value="cliente.direccion" />
+
+                </div>
+                <br />
+                <div class="form-group">
+
+                    <label for="telefono_contacto">Telefono</label>
+
+                    <InputText id="telefono_contacto" class="form-control" @bind-Value="cliente.telefono_contacto" />
+
+                </div>
+
+                <br />
+                <button type="submit" class="btn btn-primary">Editar</button>
+            </EditForm>
+
+        </div>
     </div>
-
-    <div class="form-group">
-
-        <label for="direccion">Direccion</label>
-
-        <InputText id="direccion" class="form-control" @bind-Value="cliente.direccion" />
-
-    </div>
-
-    <div class="form-group">
-
-        <label for="telefono_contacto">Telefono</label>
-
-        <InputText id="telefono_contacto" class="form-control" @bind-Value="cliente.telefono_contacto" />
-
-    </div>
-
-    <br />
-    <button type="submit" class="btn btn-primary">Editar</button>
-</EditForm>
+</div>
 
 
 @code {

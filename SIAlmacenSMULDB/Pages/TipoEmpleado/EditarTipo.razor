@@ -5,17 +5,23 @@
 <TituloSolito Nombre="Editar Tipo de Empleado" />
 
 <!--Formulario para editar un tipo de empleado-->
-
-<EditForm Model="@tipoEmpleado" OnValidSubmit="GuardarCambios">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-    <div class="form-group">
-        <label for="nombre_categoria">Nombre</label>
-        <InputText id="nombre_categoria" class="form-control" @bind-Value="tipoEmpleado.nombre_categoria" />
+<div class="container">
+    <div class="row">
+        <div class="col-sm-2"></div>
+        <div class="col-sm-8">
+            <EditForm Model="@tipoEmpleado" OnValidSubmit="GuardarCambios">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <div class="form-group">
+                    <label for="nombre_categoria">Nombre</label>
+                    <InputText id="nombre_categoria" class="form-control" @bind-Value="tipoEmpleado.nombre_categoria" />
+                </div>
+                <br />
+                <button type="submit" class="btn btn-primary">Guardar</button>
+            </EditForm>
+        </div>
     </div>
-    <br />
-    <button type="submit" class="btn btn-primary">Guardar</button>
-</EditForm>
+</div>
 
 @code {
     [Inject] protected PreloadService PreloadService { get; set; }

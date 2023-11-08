@@ -6,37 +6,46 @@
 
 <!--Formulario para editar un Empleado-->
 
-<EditForm Model="@empleado" OnValidSubmit="GuardarCambios">
+<div class="container">
+    <div class="row">
+        <div class="col-sm-2"></div>
+        <div class="col-sm-8">
 
-    <DataAnnotationsValidator />
+            <EditForm Model="@empleado" OnValidSubmit="GuardarCambios">
 
-    <ValidationSummary />
+                <DataAnnotationsValidator />
 
-    <div class="form-group">
-        <label for="nombre_completo_empleado">Nombre Completo</label>
-        <InputText id="nombre_completo_empleado" class="form-control" @bind-Value="empleado.nombre_completo_empleado" />
+                <ValidationSummary />
+
+                <div class="form-group">
+                    <label for="nombre_completo_empleado">Nombre Completo</label>
+                    <InputText id="nombre_completo_empleado" class="form-control" @bind-Value="empleado.nombre_completo_empleado" />
+                </div>
+                <br/>
+                <!--Campo salario Diario-->
+                <div class="form-group">
+                    <label for="salario_diario">Salario Diario</label>
+                    <InputNumber id="salario_diario" class="form-control" @bind-Value="empleado.salario_diario" />
+                </div>
+                <br />
+                <!--Campo tipo de empleado-->
+                <div class="form-group">
+                    <label for="tipo_empleado">Tipo de Empleado</label>
+                    <InputSelect id="tipo_empleado" class="form-control" @bind-Value="empleado.tipo_empleado_id">
+                        @foreach (var tipo in tiposDeEmpleado)
+                        {
+                            <option value="@tipo.identificador_categoria">@tipo.nombre_categoria</option>
+                        }
+                    </InputSelect>
+                </div>
+                <br />
+                <button class="btn btn-primary" type="submit">Guardar</button>
+
+            </EditForm>
+
+        </div>
     </div>
-
-    <!--Campo salario Diario-->
-    <div class="form-group">
-        <label for="salario_diario">Salario Diario</label>
-        <InputNumber id="salario_diario" class="form-control" @bind-Value="empleado.salario_diario" />
-    </div>
-
-    <!--Campo tipo de empleado-->
-    <div class="form-group">
-        <label for="tipo_empleado">Tipo de Empleado</label>
-        <InputSelect id="tipo_empleado" class="form-control" @bind-Value="empleado.tipo_empleado_id">
-            @foreach (var tipo in tiposDeEmpleado)
-            {
-                <option value="@tipo.identificador_categoria">@tipo.nombre_categoria</option>
-            }
-        </InputSelect>
-    </div>
-    <br />
-   <button class="btn btn-primary" type="submit">Guardar</button>
-
-</EditForm>
+</div>
 
 
 
@@ -52,10 +61,10 @@
         PreloadService.Show(SpinnerColor.Primary);
         try
         {
-            
+
             empleado = await Contexto.Empleados.FindAsync(id);
             //Trae los tipos de empleado cuyo estado sea activo organizados por el ID
-tiposDeEmpleado = await Contexto.TiposDeEmpleado.Where(c => c.estado == EstadoRegistro.Activo).OrderBy(c => c.identificador_categoria).ToListAsync();
+            tiposDeEmpleado = await Contexto.TiposDeEmpleado.Where(c => c.estado == EstadoRegistro.Activo).OrderBy(c => c.identificador_categoria).ToListAsync();
         }
         catch (Exception ex)
         {
@@ -86,4 +95,4 @@ tiposDeEmpleado = await Contexto.TiposDeEmpleado.Where(c => c.estado == EstadoRe
         }
     }
 
-}
+    }

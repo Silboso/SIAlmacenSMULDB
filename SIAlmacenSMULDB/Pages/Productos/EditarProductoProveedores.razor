@@ -14,51 +14,59 @@
     <EditForm Model="nuevoProductoProveedor" OnValidSubmit="RegistrarProductosProveedor">
         <DataAnnotationsValidator />
         <ValidationSummary />
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-2"></div>
+                <div class="col-sm-8">
 
-        <div class="form-group">
-            <label for="ProveedorID">Proveedor:</label>
-            <InputSelect id="ProveedorID" class="form-control" @bind-Value="nuevoProductoProveedor.ProveedorID">
-                @foreach (var proveedor in proveedores)
-                {
-                    <option value="@proveedor.ProveedorID">@proveedor.Nombre</option>
-                }
-            </InputSelect>
-            <ValidationMessage For="@(() => nuevoProductoProveedor.ProveedorID)" />
-        </div>
-        <br />
-        <button type="submit" class="btn btn-primary">Añadir</button>
-        <br />
-        <!--Tabla de proveedores actuales-->
-        @if (proveedoresSeleccionados.Any())
-        {
-            <div class="form-group">
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>ID del Proveedor</th>
-                            <th>Nombre del Proveedor</th>
-                            <th>Eliminar</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var proveedorID in proveedoresSeleccionados)
-                        {
-                            var proveedor = proveedores.FirstOrDefault(p => p.ProveedorID == proveedorID);
-                            if (proveedor != null)
+                    <div class="form-group">
+                        <label for="ProveedorID">Proveedor:</label>
+                        <InputSelect id="ProveedorID" class="form-control" @bind-Value="nuevoProductoProveedor.ProveedorID">
+                            @foreach (var proveedor in proveedores)
                             {
-                                <tr>
-                                    <td>@proveedor.ProveedorID</td>
-                                    <td>@proveedor.Nombre</td>
-                                    <td>
-                                        <button type="button" class="btn btn-danger" @onclick="() => EliminarProveedorSeleccionado(proveedorID)">Eliminar</button>
-                                    </td>
-                                </tr>
+                                <option value="@proveedor.ProveedorID">@proveedor.Nombre</option>
                             }
-                        }
-                    </tbody>
-                </table>
+                        </InputSelect>
+                        <ValidationMessage For="@(() => nuevoProductoProveedor.ProveedorID)" />
+                    </div>
+                    <br />
+                    <button type="submit" class="btn btn-primary">Añadir</button>
+                    <br />
+                    <!--Tabla de proveedores actuales-->
+                    @if (proveedoresSeleccionados.Any())
+                    {
+                        <div class="form-group">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>ID del Proveedor</th>
+                                        <th>Nombre del Proveedor</th>
+                                        <th>Eliminar</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var proveedorID in proveedoresSeleccionados)
+                                    {
+                                        var proveedor = proveedores.FirstOrDefault(p => p.ProveedorID == proveedorID);
+                                        if (proveedor != null)
+                                        {
+                                            <tr>
+                                                <td>@proveedor.ProveedorID</td>
+                                                <td>@proveedor.Nombre</td>
+                                                <td>
+                                                    <button type="button" class="btn btn-danger" @onclick="() => EliminarProveedorSeleccionado(proveedorID)">Eliminar</button>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+
+                </div>
             </div>
-        }
+        </div>
 
     </EditForm>
 </div>
@@ -82,7 +90,7 @@
             //trae el producto cuyo id sea el mismo que el producto que se esta editando
             producto = await Contexto.Productos.FindAsync(ProductoID);
             //trae los productos proveedores cuyo producto sea el mismo que el producto que se esta editando y sean activos
-productosProveedores = await Contexto.ProductosProveedores.Where(pp => pp.ProductoID == ProductoID && pp.Estado == EstadoRegistro.Activo).ToListAsync();
+            productosProveedores = await Contexto.ProductosProveedores.Where(pp => pp.ProductoID == ProductoID && pp.Estado == EstadoRegistro.Activo).ToListAsync();
             //trae los proveedores cuyo estado sea activo
             proveedores = await Contexto.Proveedores.Where(p => p.Estado == EstadoRegistro.Activo).ToListAsync();
             //trae los proveedores seleccionados
