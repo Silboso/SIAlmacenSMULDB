@@ -1,0 +1,64 @@
+﻿@inject AlmacenSQLContext Contexto
+
+<Card Class="mb-4" Style="width: 18rem; height: 18rem; overflow: hidden;">
+    <div style="max-height: 100%; overflow: hidden;">
+        <img class="rounded-top" src="@Imagen" alt="" style="width: 100%; height: 100%; object-fit: contain;" />
+    </div>
+    <CardBody>
+        <CardTitle>@producto.Nombre</CardTitle>
+        <CardSubTitle Class="mb-2 text-muted">@categoria.Nombre</CardSubTitle>
+        <CardText></CardText>
+        <Button Color="ButtonColor.Primary" To="@info" Type="ButtonType.Link"> <i class="bi bi-info"></i></Button>
+        <Button Color="ButtonColor.Secondary" To="@editar" Type="ButtonType.Link"><i class="bi bi-pencil-square"></i></Button>
+        <!--Boton que llama al evento-->
+        <Button Color="ButtonColor.Danger" @onclick="() => OnEliminar.InvokeAsync(producto.ProductoID)"><i class="bi bi-trash"></i></Button>
+    </CardBody>
+</Card>
+
+
+
+@code {
+    [Parameter] public int ProductoID { get; set; }
+    //Event Callbacks para eliminar
+    [Parameter] public EventCallback<int> OnEliminar { get; set; }
+    private Producto producto = new Producto();
+    private CategoriaProducto categoria = new CategoriaProducto();
+    private string info = "productos/Info/";
+    private string editar = "productos/Editar/";
+    private string Imagen { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        producto = await Contexto.Productos.FindAsync(ProductoID);
+        categoria = await Contexto.CategoriasProductos.FindAsync(producto.CategoriaID);
+        ConstruirLinks();
+        RevisarImagen();
+    }
+
+    private void ConstruirLinks()
+    {
+        info += producto.ProductoID;
+        editar += producto.ProductoID;
+    }
+
+    //Revisa que la imagen sea valida, si no, por defecto imagen es = https://upload.wikimedia.org/wikipedia/commons/7/75/Falta_imagen.jpg
+
+    private void RevisarImagen()
+    {
+        //Revisa que la URLImagen no sea nula o que la imagen exista en la web
+        if (producto.URLImagen == null)
+        {
+            Imagen = "https://upload.wikimedia.org/wikipedia/commons/7/75/Falta_imagen.jpg";
+        }
+        else if (!Uri.IsWellFormedUriString(producto.URLImagen, UriKind.Absolute))
+        {
+            Imagen = "https://upload.wikimedia.org/wikipedia/commons/7/75/Falta_imagen.jpg";
+        }
+        else
+        {
+            Imagen = producto.URLImagen;
+        }
+
+    }
+
+}

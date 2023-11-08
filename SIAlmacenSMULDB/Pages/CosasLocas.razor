@@ -1,0 +1,215 @@
+﻿@page "/CosasLocas"
+
+@inject AlmacenSQLContext Contexto
+
+<TituloConAñadir Nombre="Productos" Link="Productos/Crear"></TituloConAñadir>
+
+
+<!--Espacio para busquedas por codigo de barra o nombre-->
+<div class="row">
+    <div class="col-12 col-md-6">
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="basic-addon1"><i class="bi bi-search"></i></span>
+            <input type="text" class="form-control" placeholder="Buscar por código de barras o nombre" @bind="searchText" @oninput="HandleInput" />
+        </div>
+    </div>
+</div>
+
+<!--DropDown Filtro-->
+<Dropdown>
+    <DropdownToggleButton Color="ButtonColor.Primary">@GetSelectedCategoriaText()</DropdownToggleButton>
+    <DropdownMenu>
+        <DropdownItem @onclick="() => FilterProductosByCategoria(0)">Todos</DropdownItem>
+        @foreach (var categoria in categorias)
+        {
+            <DropdownItem @onclick="() => FilterProductosByCategoria(categoria.CategoriaID)">@categoria.Nombre</DropdownItem>
+        }
+    </DropdownMenu>
+</Dropdown>
+
+
+
+<!--Tarjetas perronas-->
+
+<div class="row">
+
+    @foreach (var producto in productos.Skip((currentPageNumber - 1) * itemsPerPage).Take(itemsPerPage))
+    {
+
+        <div class="col-md-4 mb-4">
+            <TarjetasPerronas OnEliminar="EliminarProducto" ProductoID="@producto.ProductoID"></TarjetasPerronas>
+        </div>
+    }
+
+</div>
+
+
+<!-- Si no hay productos, muestra un mensaje -->
+@if (productos.Count == 0)
+{
+    <div class="alert alert-info" role="alert">
+        No hay productos
+    </div>
+}
+
+<div class="d-flex justify-content-center">
+    <!-- Agrega el componente de paginación -->
+    <Pagination ActivePageNumber="@currentPageNumber"
+                TotalPages="totalPages"
+                PageChanged="OnPageChangedAsync"
+                FirstLinkIcon="IconName.ChevronDoubleLeft"
+                PreviousLinkIcon="IconName.ChevronLeft"
+                NextLinkIcon="IconName.ChevronRight"
+                LastLinkIcon="IconName.ChevronDoubleRight" />
+</div>
+
+
+@code {
+    [Inject] protected PreloadService PreloadService { get; set; }
+    private List<Producto> productos = new List<Producto>();
+    [Inject] protected ToastService ToastService { get; set; }
+    //Lista de categorias de productos
+    private List<CategoriaProducto> categorias = new List<CategoriaProducto>();
+    private int selectedCategoriaID = 0; // Inicialmente, selecciona "Todos" (0)
+                                         //Busqueda
+    private string searchText = "";
+    int currentPageNumber = 1;
+    int itemsPerPage = 9; // Define la cantidad de elementos por página
+    int totalPages => (int)Math.Ceiling(productos.Count / (double)itemsPerPage);
+
+
+    // Se ejecuta cuando se cambia de página
+    private async Task OnPageChangedAsync(int newPageNumber)
+    {
+        currentPageNumber = newPageNumber;
+        StateHasChanged(); // Asegúrate de forzar la actualización de la interfaz de usuario
+    }
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        PreloadService.Show(SpinnerColor.Primary);
+        try
+        {
+            await Task.Run(async () =>
+            {
+                //Trae los productos cuyo estado sea activo
+                productos = await Contexto.Productos.Where(p => p.Estado == EstadoRegistro.Activo).ToListAsync();
+                //Trae las categorias de productos sin importar su estado
+                categorias = await Contexto.CategoriasProductos.ToListAsync();
+                //Calcula el total de paginas
+            });
+            //Añade un retraso de medio segundo para que se muestre el spinner
+            await Task.Delay(500);
+
+        }
+        catch (Exception e)
+        {
+            PreloadService.Hide();
+            await Application.Current.MainPage.DisplayAlert("Error", "Fallo al conectarse a base de datos" + e, "Ok");
+        }
+        finally
+        {
+            PreloadService.Hide();
+        }
+
+
+    }
+
+    private async void EliminarProducto(int id)
+    {
+        var producto = await Contexto.Productos.FindAsync(id);
+        //Muestra una alerta de confirmacion
+        bool respuesta = await Application.Current.MainPage.DisplayAlert("Confirmacion",
+        "¿Estas seguro de eliminar este producto?\n" +
+        "ID del Producto: " + producto.ProductoID +
+        "\nNombre: " + producto.Nombre +
+        "\nDescripcion: " + producto.Descripcion +
+        "\nCodigo de barras: " + producto.CodigoBarra,
+        "Si", "No");
+        if (respuesta)
+        {
+            PreloadService.Show(SpinnerColor.Primary);
+            try
+            {
+                //Elimina el producto, para ello solo se actualiza el estado del producto
+                producto.Estado = EstadoRegistro.Inactivo;
+                Contexto.Productos.Update(producto);
+                await Contexto.SaveChangesAsync();
+
+                //Actualiza la lista de productos
+                productos = await Contexto.Productos.Where(p => p.Estado == EstadoRegistro.Activo).ToListAsync();
+                //Refresca la interfaz
+                StateHasChanged();
+                //Espera 1 segundo
+                await Task.Delay(500);
+                PreloadService.Hide();
+                //Tostada "El registro se elimino con exito
+                ToastService.Notify(new(ToastType.Warning, $"Eliminado con exito"));
+            }
+            catch (Exception e)
+            {
+                PreloadService.Hide();
+                await Application.Current.MainPage.DisplayAlert("Error", "Fallo al conectarse a base de datos" + e, "Ok");
+            }
+        }
+    }
+
+    private void FilterProductosByCategoria(int categoriaID)
+    {
+        selectedCategoriaID = categoriaID;
+        // Filtra la lista de productos según la categoría seleccionada
+        if (categoriaID == 0)
+        {
+            // Muestra todos los productos
+            productos = Contexto.Productos.Where(p => p.Estado == EstadoRegistro.Activo).ToList();
+        }
+        else
+        {
+            // Muestra solo los productos de la categoría seleccionada
+            productos = Contexto.Productos.Where(p => p.Estado == EstadoRegistro.Activo && p.CategoriaID == categoriaID).ToList();
+        }
+        StateHasChanged();
+    }
+
+    private string GetSelectedCategoriaText()
+    {
+        if (selectedCategoriaID == 0)
+        {
+            return "Todos";
+        }
+        else
+        {
+            return categorias.Find(c => c.CategoriaID == selectedCategoriaID).Nombre;
+        }
+    }
+
+    private void HandleInput(ChangeEventArgs e)
+    {
+        searchText = e.Value.ToString();
+        SearchProductos();
+    }
+
+
+
+
+    private void SearchProductos()
+    {
+        if (string.IsNullOrWhiteSpace(searchText))
+        {
+            // Muestra todos los productos si el campo de búsqueda está vacío
+            productos = Contexto.Productos.Where(p => p.Estado == EstadoRegistro.Activo).ToList();
+        }
+        else
+        {
+            // Muestra solo los productos que coincidan con el texto de búsqueda
+            productos = Contexto.Productos.Where(p => p.Estado == EstadoRegistro.Activo && (p.Nombre.Contains(searchText) || p.CodigoBarra.Contains(searchText))).ToList();
+        }
+        StateHasChanged();
+    }
+
+
+
+
+}
