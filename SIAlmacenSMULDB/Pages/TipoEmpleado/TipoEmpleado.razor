@@ -53,7 +53,7 @@
         try
         {
             //Trae los clientes que tengan el estado activo en orden por el id, ignora el 11
-tipoEmpleados = await Contexto.TiposDeEmpleado.Where(c => c.estado == EstadoRegistro.Activo && c.identificador_categoria != 11).OrderBy(c => c.identificador_categoria).ToListAsync();
+            tipoEmpleados = await Contexto.TiposDeEmpleado.Where(c => c.estado == EstadoRegistro.Activo && c.identificador_categoria != 11).OrderBy(c => c.identificador_categoria).ToListAsync();
             //Espera 1 segundo
             await Task.Delay(500);
         }

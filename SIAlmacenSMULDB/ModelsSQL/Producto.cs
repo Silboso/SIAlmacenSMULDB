@@ -23,6 +23,7 @@ namespace SIAlmacenSMULDB.ModelsSQL
     );*/
     //Todos los valores son requeridos excepto el ID
     [Table("Productos")]
+    [Index(nameof(CodigoBarra), IsUnique = true)]
     public class Producto
     {
         [Key]
@@ -43,6 +44,7 @@ namespace SIAlmacenSMULDB.ModelsSQL
         //Solo aecpta numeros y guiones
         [RegularExpression(@"^[0-9\-]*$")]
 
+        
         public string CodigoBarra { get; set; }
         //Tamaño maximo de 255 caracteres
         [StringLength(255)]
